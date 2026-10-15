@@ -170,7 +170,7 @@ with tab_chat:
                 tools_list = [{"google_search": {}}] if perm_search else []
                 
                 response = client.models.generate_content(
-                    model="gemini-2.5-flash",
+                    model="gemini-3.8-flash",
                     contents=active_contents,
                     config=types.GenerateContentConfig(
                         system_instruction=SYSTEM_PROMPT,
