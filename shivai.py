@@ -10,9 +10,9 @@ from google import genai
 from google.genai import types
 
 # ==========================================
-# 1. PAGE SETUP & SHIVAI HUD CSS
+# 1. PAGE SETUP & SHIVAM HUD CSS
 # ==========================================
-st.set_page_config(page_title="SHIVAI | SHIVAM HUD", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="SHIVAI | SHIVAM AI LABS", page_icon="⚡", layout="wide")
 
 SHIVAI_CSS = """
 <style>
@@ -131,7 +131,7 @@ SHIVAI_CSS = """
     box-shadow: 0 0 12px rgba(0, 229, 255, 0.25);
 }
 
-/* Chat Messages - Hologram Panels */
+/* Chat Messages */
 [data-testid="stChatMessage"] {
     background: rgba(6, 20, 39, 0.75) !important;
     border: 1px solid rgba(0, 229, 255, 0.25);
@@ -167,7 +167,10 @@ SHIVAI_CSS = """
         <span class="arc-reactor"></span>
         S.H.I.V.A.I.
     </div>
-    <div class="hud-sub">⚡ SHIVAM ENTERPRISES NEURAL INTELLIGENCE MATRIX | CREATOR & BOSS: SHIVAM</div>
+    <div class="hud-sub">⚡ SHIVAM AI LABS | COMMANDER: SHIVAM</div>
+    <div class="hud-sub" style="font-size: 0.85rem; color: #00e5ff; margin-top: 2px;">SHIVAM ENTERPRISES NEURAL MATRIX | OWNER: SHIVAM</div>
+    <div class="hud-sub" style="font-size: 0.75rem; color: #94a3b8; margin-top: 2px;">SHIVAM CORE SYSTEMS | OPERATOR: SHIVAM</div>
+    
     <div class="hud-metrics">
         <div class="metric-pill">🟢 CORE: ONLINE (SHIVAI-X1)</div>
         <div class="metric-pill">🛡️ SECURITY: SHIVAM-LOCK ACTIVE</div>
@@ -261,7 +264,7 @@ def ask_shivai(contents, system_prompt=None, use_search=False):
             continue
             
     if any("429" in err or "RESOURCE_EXHAUSTED" in err for err in errors):
-        return "⚠️ **SHIVAI SERVER ALERT (429):** Boss, aapki API Key ka free quota abhi full ho gaya hai. 30 second wait karein ya AI Studio se naye project me key banayein."
+        return "⚠️ **SHIVAI SERVER ALERT (429):** Boss, aapki API Key ka free quota abhi full ho gaya hai. 30 second wait karein."
         
     return f"⚠️ **HUD TRANSMISSION ERROR:** `{errors[0] if errors else 'Unknown Error'}`"
 
@@ -321,7 +324,7 @@ with st.sidebar:
 mode_instructions = {
     "⚡ SHIVAI Tactical & Live Recon (All-Rounder)": "Act as Shivam's personal ultra-intelligent, witty, and loyal AI assistant.",
     "🧠 X1 Deep Logic & Strategy (Reasoning)": "Run deep tactical simulations and step-by-step first-principles calculations.",
-    "💻 Shivam Cybernetics & Code Forge (Coding)": "Write futuristic, clean, bug-free production code for Shivam Labs.",
+    "💻 Shivam Cybernetics & Code Forge (Coding)": "Write futuristic, clean, bug-free production code for Shivam AI Labs.",
     "🛰️ Global Satellite Deep Research (Report)": "Provide high-level intelligence briefings with Executive Summary, Tactical Data, and Actionable Insights.",
     "💼 Shivam Enterprises Boardroom Advisor (Business)": "Advise Shivam like a top billionaire strategist—focus on ROI, scale, monopoly, and smart execution."
 }
@@ -330,8 +333,8 @@ saved_context = json.dumps(memory_data["notes"], ensure_ascii=False) if perm_mem
 
 SYSTEM_PROMPT = f"""
 Identity:
-- You are S.H.I.V.A.I. (Shivam's Holographic Intelligent Virtual Assistant Interface), built exclusively by Shivam under Shivam Enterprises.
-- Your Creator, Owner & Boss: Shivam (address him respectfully as "Boss", "Sir", or "Commander Shivam").
+- You are S.H.I.V.A.I. (Shivam's Intelligent Virtual AI), built exclusively by Shivam under Shivam AI Labs & Shivam Enterprises.
+- Your Creator, Owner & Commander: Shivam (address him respectfully as "Boss", "Sir", or "Commander Shivam").
 - Tone: Cool, futuristic, confident, loyal, crisp, and hyper-intelligent.
 - Language: Natural Hinglish, Hindi, or English (match Shivam's style).
 
@@ -357,7 +360,7 @@ with tab_chat:
 
     if "messages" not in st.session_state:
         st.session_state.messages = [
-            {"role": "assistant", "content": "⚡ **All systems online, Boss.** Neural Core at 100% capacity. **S.H.I.V.A.I. X1** interface is ready for Shivam Enterprises. Bataiye Sir, aaj kya mission hai?"}
+            {"role": "assistant", "content": "⚡ **All systems online, Boss.** Shivam Neural Matrix at 100% capacity. **S.H.I.V.A.I. X1** interface is ready for Shivam AI Labs. Bataiye Sir, aaj kya mission hai?"}
         ]
 
     for msg in st.session_state.messages:
@@ -379,7 +382,7 @@ with tab_chat:
             display_text = "🎙️ *[Encrypted Voice Transmission Sent]*"
             active_contents = [
                 types.Part.from_bytes(data=audio_bytes, mime_type="audio/wav"),
-                "Sun kar samjho ki Boss Shivam ne kya command di hai aur satik jawab do."
+                "Sun kar samjho ki Commander Shivam ne kya command di hai aur satik jawab do."
             ]
 
     if active_contents:
@@ -388,7 +391,7 @@ with tab_chat:
             st.markdown(display_text)
 
         with st.chat_message("assistant"):
-            with st.spinner("⚡ Scanning SHIVAI Mainframe..."):
+            with st.spinner("⚡ Scanning Shivam Core Systems..."):
                 reply = ask_shivai(active_contents, system_prompt=SYSTEM_PROMPT, use_search=perm_search)
                 st.markdown(reply)
                 st.session_state.messages.append({"role": "assistant", "content": reply})
@@ -416,7 +419,7 @@ with tab_files:
             df = pd.read_csv(uploaded_file) if file_ext == "csv" else pd.read_excel(uploaded_file)
             st.write("### 📊 Telemetry Matrix Preview:")
             st.dataframe(df.head(10))
-            if st.button("⚡ RUN SHIVAI TELEMETRY SCAN"):
+            if st.button("⚡ RUN SHIVAM TELEMETRY SCAN"):
                 with st.spinner("Analyzing data matrix..."):
                     data_summary = f"Columns: {list(df.columns)}\nSample:\n{df.head(15).to_string()}\nStats:\n{df.describe().to_string()}"
                     reply = ask_shivai(f"{file_question}\n\nData:\n{data_summary}", system_prompt=SYSTEM_PROMPT)
@@ -457,7 +460,7 @@ with tab_auto:
             st.warning("Boss, please enter the mission parameters first.")
         else:
             with st.spinner("Deploying SHIVAI Legion protocol..."):
-                reply = ask_shivai(f"Protocol: {task_type}\nMission Details: {task_detail}\nExecute for Boss Shivam.", system_prompt=SYSTEM_PROMPT)
+                reply = ask_shivai(f"Protocol: {task_type}\nMission Details: {task_detail}\nExecute for Commander Shivam.", system_prompt=SYSTEM_PROMPT)
                 st.success("✅ Mission Accomplished, Boss!")
                 st.markdown(reply)
                 st.download_button("📥 DOWNLOAD CLASSIFIED DOSSIER", data=reply, file_name="shivai_dossier.md", mime="text/markdown")
