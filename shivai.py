@@ -42,20 +42,35 @@ def save_memory(data):
 memory_data = load_memory()
 
 # ==========================================
-# 2. SMART AUTO-FALLBACK ENGINE (Crash Proof)
+# 2. AUTO-DETECT MODEL ENGINE (Kabhi 404 Nahi Aayega)
 # ==========================================
-AVAILABLE_MODELS = [
-    "gemini-3.0-flash",
-    "gemini-2.5-flash",
-    "gemini-2.0-flash",
-    "gemini-1.5-flash"
-]
+@st.cache_data(ttl=3600)
+def get_working_models():
+    """Yeh function Google se puch kar aapki Key par chalu models ki list nikalega"""
+    valid_models = []
+    try:
+        for m in client.models.list():
+            name = m.name.replace("models/", "")
+            # Sirf text/chat generate karne wale gemini models chunein
+            if "gemini" in name.lower() and not any(x in name.lower() for x in ["embedding", "imagen", "veo", "audio", "tts", "aqa"]):
+                valid_models.append(name)
+    except Exception:
+        pass
+    
+    # Flash models ko pehle rakhein kyunki unka free quota sabse zyada hota hai
+    flash_models = [m for m in valid_models if "flash" in m]
+    other_models = [m for m in valid_models if "flash" not in m]
+    
+    final_list = flash_models + other_models
+    if not final_list:
+        final_list = ["gemini-3.8-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+    return final_list
 
 def ask_shivai(contents, system_prompt=None, use_search=False):
-    last_error = ""
+    models_to_try = get_working_models()
+    errors = []
     
-    # Pehle bina search ya search ke sath models try karega
-    for model_name in AVAILABLE_MODELS:
+    for model_name in models_to_try:
         try:
             tools = [{"google_search": {}}] if use_search else None
             config = types.GenerateContentConfig(
@@ -70,8 +85,9 @@ def ask_shivai(contents, system_prompt=None, use_search=False):
             if res and res.text:
                 return res.text
         except Exception as e:
-            last_error = str(e)
-            # Agar search tool ki wajah se 429 quota error aaye, toh turant bina search ke jawab dega
+            err_str = str(e)
+            errors.append(f"{model_name}: {err_str}")
+            # Agar search tool ki wajah se error ho toh bina search ke try karein
             if use_search:
                 try:
                     config_no_search = types.GenerateContentConfig(system_instruction=system_prompt)
@@ -82,11 +98,15 @@ def ask_shivai(contents, system_prompt=None, use_search=False):
                     )
                     if res and res.text:
                         return res.text
-                except Exception as e2:
-                    last_error = str(e2)
+                except Exception:
+                    pass
             continue
             
-    return f"⚠️ Free API Key ki 1-minute limit abhi puri ho gayi hai. Kripya 30 second ruk kar dobara message bhejein.\n\n*(Error Info: {last_error})*"
+    # Agar sabhi models par 429 Quota error aaye
+    if any("429" in err or "RESOURCE_EXHAUSTED" in err for err in errors):
+        return "⚠️ **Quota Limit Reached (429):** Aapki is API Key ka free quota abhi khatam ho gaya hai. Kripya Google AI Studio (aistudio.google.com/app/apikey) par jaakar **'Create API key in new project'** par click karein aur woh nayi key Streamlit Secrets me daalein."
+        
+    return f"⚠️ Koi bhi model jawab nahi de paya. Details:\n`{errors[0] if errors else 'Unknown Error'}`"
 
 # ==========================================
 # 3. SIDEBAR: BRAIN ROUTER, PRIVACY & MEMORY
