@@ -39,7 +39,7 @@ memory_data = load_memory()
 # ==========================================
 st.set_page_config(page_title="SHIVAI", page_icon="🧠", layout="wide")
 
-st.title("🧠 SHIVAI — Advanced Personal AI")
+st.title("SHIVAI")
 st.caption("*Your Mind. Your AI. Your Future.* | **Owner:** Shivam")
 
 # ==========================================
