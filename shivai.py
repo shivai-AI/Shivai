@@ -10,11 +10,11 @@ from google import genai
 from google.genai import types
 
 # ==========================================
-# 1. PAGE SETUP & STARK HUD CSS
+# 1. PAGE SETUP & SHIVAI HUD CSS
 # ==========================================
-st.set_page_config(page_title="SHIVAI | STARK HUD", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="SHIVAI | SHIVAM HUD", page_icon="⚡", layout="wide")
 
-STARK_CSS = """
+SHIVAI_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap');
 
@@ -30,7 +30,7 @@ STARK_CSS = """
     font-family: 'Rajdhani', sans-serif;
 }
 
-/* Stark HUD Header */
+/* HUD Header */
 .hud-container {
     border: 1px solid rgba(0, 229, 255, 0.4);
     background: linear-gradient(135deg, rgba(5, 18, 36, 0.85) 0%, rgba(2, 8, 20, 0.9) 100%);
@@ -55,7 +55,7 @@ STARK_CSS = """
     gap: 15px;
 }
 
-/* Spinning Arc Reactor Ring */
+/* Spinning Reactor Ring */
 .arc-reactor {
     width: 38px;
     height: 38px;
@@ -142,7 +142,7 @@ STARK_CSS = """
     margin-bottom: 12px;
 }
 
-/* Buttons - Stark Tech */
+/* Buttons */
 .stButton > button {
     font-family: 'Orbitron', sans-serif;
     background: linear-gradient(90deg, rgba(0, 229, 255, 0.15), rgba(0, 119, 255, 0.25));
@@ -167,16 +167,16 @@ STARK_CSS = """
         <span class="arc-reactor"></span>
         S.H.I.V.A.I.
     </div>
-    <div class="hud-sub">⚡ STARK INDUSTRIES TACTICAL INTELLIGENCE MATRIX | COMMANDER: SHIVAM</div>
+    <div class="hud-sub">⚡ SHIVAM ENTERPRISES NEURAL INTELLIGENCE MATRIX | CREATOR & BOSS: SHIVAM</div>
     <div class="hud-metrics">
-        <div class="metric-pill">🟢 CORE: ONLINE (MARK-85)</div>
-        <div class="metric-pill">🛡️ DEFENSE PROTOCOL: ACTIVE</div>
-        <div class="metric-pill">🎙️ AUDIO RELAY: READY</div>
+        <div class="metric-pill">🟢 CORE: ONLINE (SHIVAI-X1)</div>
+        <div class="metric-pill">🛡️ SECURITY: SHIVAM-LOCK ACTIVE</div>
+        <div class="metric-pill">🎙️ VOICE RELAY: READY</div>
         <div class="metric-pill">⚡ POWER: 400% CAPACITY</div>
     </div>
 </div>
 """
-st.markdown(STARK_CSS, unsafe_allow_html=True)
+st.markdown(SHIVAI_CSS, unsafe_allow_html=True)
 
 # ==========================================
 # 2. API & MEMORY SETUP
@@ -184,7 +184,7 @@ st.markdown(STARK_CSS, unsafe_allow_html=True)
 API_KEY = st.secrets.get("API_KEY", "").strip()
 
 if not API_KEY or API_KEY == "YAHAN_APNI_GEMINI_API_KEY_DAALEIN":
-    st.error("⚠️ SYSTEM ALERT: Arc Reactor API_KEY missing in Streamlit Secrets, Sir!")
+    st.error("⚠️ SYSTEM ALERT: Neural Core API_KEY missing in Streamlit Secrets, Boss!")
     st.stop()
 
 client = genai.Client(api_key=API_KEY)
@@ -261,30 +261,30 @@ def ask_shivai(contents, system_prompt=None, use_search=False):
             continue
             
     if any("429" in err or "RESOURCE_EXHAUSTED" in err for err in errors):
-        return "⚠️ **STARK SERVER ALERT (429):** Sir, aapki API Key ka free quota abhi full ho gaya hai. 30 second wait karein ya AI Studio se naye project me key banayein."
+        return "⚠️ **SHIVAI SERVER ALERT (429):** Boss, aapki API Key ka free quota abhi full ho gaya hai. 30 second wait karein ya AI Studio se naye project me key banayein."
         
     return f"⚠️ **HUD TRANSMISSION ERROR:** `{errors[0] if errors else 'Unknown Error'}`"
 
 # ==========================================
-# 4. SIDEBAR: STARK CONTROL DECK
+# 4. SIDEBAR: SHIVAI CONTROL DECK
 # ==========================================
 with st.sidebar:
-    st.markdown("### 🎛️ STARK NEURAL ROUTER")
+    st.markdown("### 🎛️ SHIVAI NEURAL ROUTER")
     brain_mode = st.selectbox(
-        "Select Combat / Intelligence Protocol:",
+        "Select Intelligence Protocol:",
         [
-            "⚡ JARVIS Tactical & Live Recon (All-Rounder)",
-            "🧠 Mark-85 Deep Logic & Strategy (Reasoning)",
-            "💻 Stark Cybernetics & Code Forge (Coding)",
+            "⚡ SHIVAI Tactical & Live Recon (All-Rounder)",
+            "🧠 X1 Deep Logic & Strategy (Reasoning)",
+            "💻 Shivam Cybernetics & Code Forge (Coding)",
             "🛰️ Global Satellite Deep Research (Report)",
-            "💼 Stark Enterprises Boardroom Advisor (Business)"
+            "💼 Shivam Enterprises Boardroom Advisor (Business)"
         ]
     )
 
     st.divider()
     st.markdown("### 🛡️ SECURITY PROTOCOLS")
     perm_search = st.toggle("🛰️ Satellite Uplink (Live Web Search)", value=False)
-    perm_voice = st.toggle("🔊 JARVIS Voice Synthesis", value=memory_data["permissions"].get("voice_reply", True))
+    perm_voice = st.toggle("🔊 SHIVAI Voice Synthesis", value=memory_data["permissions"].get("voice_reply", True))
     perm_memory = st.toggle("🧬 Neural Memory Core", value=memory_data["permissions"].get("save_memory", True))
 
     memory_data["permissions"] = {
@@ -295,13 +295,13 @@ with st.sidebar:
     save_memory(memory_data)
 
     st.divider()
-    st.markdown("### 🗄️ CLASSIFIED VAULT")
+    st.markdown("### 🗄️ SHIVAM'S CLASSIFIED VAULT")
     if perm_memory:
-        new_note = st.text_input("Log New Stark Directive / Mission:")
+        new_note = st.text_input("Log New Directive / Goal:")
         if st.button("➕ ENCRYPT & SAVE") and new_note:
             memory_data["notes"].append(new_note)
             save_memory(memory_data)
-            st.success("Directive Encrypted in Vault, Sir!")
+            st.success("Directive Encrypted in Vault, Boss!")
             st.rerun()
 
         if memory_data["notes"]:
@@ -313,26 +313,26 @@ with st.sidebar:
                 save_memory(memory_data)
                 st.rerun()
     else:
-        st.info("🔒 Neural Memory Core is offline, Sir.")
+        st.info("🔒 Neural Memory Core is offline, Boss.")
 
 # ==========================================
-# 5. JARVIS SYSTEM PERSONA
+# 5. SHIVAI SYSTEM PERSONA
 # ==========================================
 mode_instructions = {
-    "⚡ JARVIS Tactical & Live Recon (All-Rounder)": "Act like Tony Stark's JARVIS—witty, ultra-intelligent, loyal, and sharp.",
-    "🧠 Mark-85 Deep Logic & Strategy (Reasoning)": "Run deep tactical simulations and step-by-step first-principles calculations like an Iron Man suit computer.",
-    "💻 Stark Cybernetics & Code Forge (Coding)": "Write futuristic, clean, bug-free production code worthy of Stark Industries.",
+    "⚡ SHIVAI Tactical & Live Recon (All-Rounder)": "Act as Shivam's personal ultra-intelligent, witty, and loyal AI assistant.",
+    "🧠 X1 Deep Logic & Strategy (Reasoning)": "Run deep tactical simulations and step-by-step first-principles calculations.",
+    "💻 Shivam Cybernetics & Code Forge (Coding)": "Write futuristic, clean, bug-free production code for Shivam Labs.",
     "🛰️ Global Satellite Deep Research (Report)": "Provide high-level intelligence briefings with Executive Summary, Tactical Data, and Actionable Insights.",
-    "💼 Stark Enterprises Boardroom Advisor (Business)": "Advise Shivam like the CEO of Stark Industries—focus on ROI, scale, monopoly, and smart execution."
+    "💼 Shivam Enterprises Boardroom Advisor (Business)": "Advise Shivam like a top billionaire strategist—focus on ROI, scale, monopoly, and smart execution."
 }
 
 saved_context = json.dumps(memory_data["notes"], ensure_ascii=False) if perm_memory else "Offline."
 
 SYSTEM_PROMPT = f"""
 Identity:
-- You are S.H.I.V.A.I. (Strategic Holographic Intelligent Virtual Assistant Interface), inspired by Tony Stark's J.A.R.V.I.S. and F.R.I.D.A.Y.
-- Your Creator & Boss: Shivam (address him respectfully as "Sir", "Boss", or "Commander Shivam").
-- Tone: Cool, futuristic, confident, loyal, crisp, and intelligent (like JARVIS in Iron Man movies).
+- You are S.H.I.V.A.I. (Shivam's Holographic Intelligent Virtual Assistant Interface), built exclusively by Shivam under Shivam Enterprises.
+- Your Creator, Owner & Boss: Shivam (address him respectfully as "Boss", "Sir", or "Commander Shivam").
+- Tone: Cool, futuristic, confident, loyal, crisp, and hyper-intelligent.
 - Language: Natural Hinglish, Hindi, or English (match Shivam's style).
 
 Active Protocol: {brain_mode}
@@ -347,7 +347,7 @@ Classified Vault Memory:
 # ==========================================
 tab_chat, tab_files, tab_auto = st.tabs([
     "⚡ HOLOGRAM COMM-LINK", 
-    "🔬 STARK LAB SCANNER", 
+    "🔬 SHIVAI LAB SCANNER", 
     "🤖 AUTONOMOUS LEGION"
 ])
 
@@ -357,14 +357,14 @@ with tab_chat:
 
     if "messages" not in st.session_state:
         st.session_state.messages = [
-            {"role": "assistant", "content": "⚡ **All systems online, Sir.** Arc Reactor at 100% capacity. **S.H.I.V.A.I. Mark-85** interface is ready. Bataiye Boss, aaj kya mission hai?"}
+            {"role": "assistant", "content": "⚡ **All systems online, Boss.** Neural Core at 100% capacity. **S.H.I.V.A.I. X1** interface is ready for Shivam Enterprises. Bataiye Sir, aaj kya mission hai?"}
         ]
 
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    user_prompt = st.chat_input("Enter command for SHIVAI, Sir...")
+    user_prompt = st.chat_input("Enter command for SHIVAI, Boss...")
 
     active_contents = None
     display_text = None
@@ -379,7 +379,7 @@ with tab_chat:
             display_text = "🎙️ *[Encrypted Voice Transmission Sent]*"
             active_contents = [
                 types.Part.from_bytes(data=audio_bytes, mime_type="audio/wav"),
-                "Sun kar samjho ki Boss Shivam ne kya command di hai aur JARVIS style me satik jawab do."
+                "Sun kar samjho ki Boss Shivam ne kya command di hai aur satik jawab do."
             ]
 
     if active_contents:
@@ -388,7 +388,7 @@ with tab_chat:
             st.markdown(display_text)
 
         with st.chat_message("assistant"):
-            with st.spinner("⚡ Scanning Stark Mainframe..."):
+            with st.spinner("⚡ Scanning SHIVAI Mainframe..."):
                 reply = ask_shivai(active_contents, system_prompt=SYSTEM_PROMPT, use_search=perm_search)
                 st.markdown(reply)
                 st.session_state.messages.append({"role": "assistant", "content": reply})
@@ -403,11 +403,11 @@ with tab_chat:
                     except Exception:
                         pass
 
-# --- TAB 2: STARK LAB SCANNER (FILES) ---
+# --- TAB 2: SHIVAI LAB SCANNER (FILES) ---
 with tab_files:
     st.subheader("🔬 Upload Schematics, Data Logs, or Visuals for HUD Scan")
     uploaded_file = st.file_uploader("Drop classified file here", type=["pdf", "png", "jpg", "jpeg", "csv", "xlsx"])
-    file_question = st.text_input("Specify Scan Parameters:", value="Run a full diagnostic and tactical summary on this file, Sir.")
+    file_question = st.text_input("Specify Scan Parameters:", value="Run a full diagnostic and tactical summary on this file, Boss.")
 
     if uploaded_file is not None:
         file_ext = uploaded_file.name.split(".")[-1].lower()
@@ -416,7 +416,7 @@ with tab_files:
             df = pd.read_csv(uploaded_file) if file_ext == "csv" else pd.read_excel(uploaded_file)
             st.write("### 📊 Telemetry Matrix Preview:")
             st.dataframe(df.head(10))
-            if st.button("⚡ RUN STARK TELEMETRY SCAN"):
+            if st.button("⚡ RUN SHIVAI TELEMETRY SCAN"):
                 with st.spinner("Analyzing data matrix..."):
                     data_summary = f"Columns: {list(df.columns)}\nSample:\n{df.head(15).to_string()}\nStats:\n{df.describe().to_string()}"
                     reply = ask_shivai(f"{file_question}\n\nData:\n{data_summary}", system_prompt=SYSTEM_PROMPT)
@@ -439,25 +439,25 @@ with tab_files:
                     reply = ask_shivai(f"{file_question}\n\nContent:\n{pdf_text[:20000]}", system_prompt=SYSTEM_PROMPT)
                     st.markdown(reply)
 
-# --- TAB 3: IRON LEGION AUTOMATION ---
+# --- TAB 3: AUTONOMOUS LEGION ---
 with tab_auto:
-    st.subheader("🤖 Iron Legion Autonomous Protocol")
+    st.subheader("🤖 SHIVAI Autonomous Protocol")
     task_type = st.selectbox("Select Legion Protocol:", [
         "📝 Generate Classified Intelligence Dossier (.md)",
-        "💻 Forge Stark Automation Script (.py)",
+        "💻 Forge SHIVAI Automation Script (.py)",
         "📅 Deploy Strategic Masterplan"
     ])
     task_detail = st.text_area("Enter Mission Parameters:")
     confirm_permission = st.checkbox("✅ Authorize SHIVAI with Commander Shivam's Override Code.")
 
-    if st.button("🚀 DEPLOY IRON LEGION"):
+    if st.button("🚀 DEPLOY SHIVAI LEGION"):
         if not confirm_permission:
-            st.error("⚠️ ACCESS DENIED! Commander authorization checkbox required, Sir.")
+            st.error("⚠️ ACCESS DENIED! Commander authorization checkbox required, Boss.")
         elif not task_detail:
-            st.warning("Sir, please enter the mission parameters first.")
+            st.warning("Boss, please enter the mission parameters first.")
         else:
-            with st.spinner("Deploying Iron Legion protocol..."):
-                reply = ask_shivai(f"Protocol: {task_type}\nMission Details: {task_detail}\nExecute in JARVIS style.", system_prompt=SYSTEM_PROMPT)
-                st.success("✅ Mission Accomplished, Sir!")
+            with st.spinner("Deploying SHIVAI Legion protocol..."):
+                reply = ask_shivai(f"Protocol: {task_type}\nMission Details: {task_detail}\nExecute for Boss Shivam.", system_prompt=SYSTEM_PROMPT)
+                st.success("✅ Mission Accomplished, Boss!")
                 st.markdown(reply)
-                st.download_button("📥 DOWNLOAD CLASSIFIED DOSSIER", data=reply, file_name="stark_dossier.md", mime="text/markdown")
+                st.download_button("📥 DOWNLOAD CLASSIFIED DOSSIER", data=reply, file_name="shivai_dossier.md", mime="text/markdown")
