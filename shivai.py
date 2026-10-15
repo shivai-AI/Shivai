@@ -12,7 +12,6 @@ from google.genai import types
 # ==========================================
 # 1. API & PRIVACY CONFIGURATION
 # ==========================================
-# Cloud secrets se API Key lega, agar local ho toh direct bhi chalega
 try:
     API_KEY = st.secrets["API_KEY"]
 except Exception:
@@ -212,7 +211,7 @@ with tab_files:
                 with st.spinner("SHIVAI data analyse kar raha hai..."):
                     data_summary = f"Columns: {list(df.columns)}\nSample Data:\n{df.head(20).to_string()}\nStats:\n{df.describe().to_string()}"
                     res = client.models.generate_content(
-                        model="gemini-2.5-flash",
+                        model="gemini-3.8-flash",
                         contents=f"{file_question}\n\nData:\n{data_summary}",
                         config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT)
                     )
@@ -224,7 +223,7 @@ with tab_files:
             if st.button("🧠 Analyse Image with SHIVAI"):
                 with st.spinner("SHIVAI image dekh raha hai..."):
                     res = client.models.generate_content(
-                        model="gemini-2.5-flash",
+                        model="gemini-3.8-flash",
                         contents=[img, file_question],
                         config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT)
                     )
@@ -238,6 +237,48 @@ with tab_files:
             st.success(f"PDF Loaded ({len(reader.pages)} pages)")
             if st.button("🧠 Analyse PDF with SHIVAI"):
                 with st.spinner("SHIVAI PDF padh raha hai..."):
+                    res = client.models.generate_content(
+                        model="gemini-3.8-flash",
+                        contents=f"{file_question}\n\nDocument Content:\n{pdf_text[:20000]}",
+                        config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT)
+                    )
+                    st.markdown(res.text)
+
+# --- TAB 3: TASK AUTOMATION ---
+with tab_auto:
+    st.subheader("⚙️ Permission-Based Digital Automation")
+    st.write("SHIVAI aapki permission ke bina koi action nahi lega.")
+    
+    task_type = st.selectbox("Select Automation Task:", [
+        "📝 Generate & Save Report to File (.txt / .md)",
+        "💻 Generate Python Automation Script",
+        "📅 Create Daily Study / Business Action Plan"
+    ])
+    
+    task_detail = st.text_area("Task ki detail likhein (e.g., 'AI startup ke liye 30 days ka plan banao'):")
+    confirm_permission = st.checkbox("✅ Main SHIVAI ko ye task execute karne ki permission deta hun.")
+
+    if st.button("🚀 Execute Task"):
+        if not confirm_permission:
+            st.error("⚠️ Permission Denied! Pehle checkbox par tick karke permission dein.")
+        elif not task_detail:
+            st.warning("Pehle task ki detail likhein.")
+        else:
+            with st.spinner("SHIVAI task execute kar raha hai..."):
+                res = client.models.generate_content(
+                    model="gemini-3.8-flash",
+                    contents=f"Task Type: {task_type}\nDetails: {task_detail}\nExecute this thoroughly.",
+                    config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT)
+                )
+                st.success("✅ Task Completed Successfully!")
+                st.markdown(res.text)
+                st.download_button(
+                    label="📥 Download Output File",
+                    data=res.text,
+                    file_name="shivai_output.md",
+                    mime="text/markdown"
+                )
+HIVAI PDF padh raha hai..."):
                     res = client.models.generate_content(
                         model="gemini-2.5-flash",
                         contents=f"{file_question}\n\nDocument Content:\n{pdf_text[:20000]}",
