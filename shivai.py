@@ -12,10 +12,15 @@ from google.genai import types
 # ==========================================
 # 1. API & PRIVACY CONFIGURATION
 # ==========================================
-try:
-    API_KEY = st.secrets["API_KEY"]
-except Exception:
-    API_KEY = "YAHAN_APNI_GEMINI_API_KEY_DAALEIN"
+st.set_page_config(page_title="SHIVAI", page_icon="🧠", layout="wide")
+st.title("SHIVAI")
+st.caption("*Your Mind. Your AI. Your Future.* | **Owner:** Shivam")
+
+API_KEY = st.secrets.get("API_KEY", "").strip()
+
+if not API_KEY or API_KEY == "YAHAN_APNI_GEMINI_API_KEY_DAALEIN":
+    st.error("⚠️ Kripya Streamlit App Settings -> Secrets me apni API_KEY daalein!")
+    st.stop()
 
 client = genai.Client(api_key=API_KEY)
 
@@ -23,9 +28,12 @@ MEMORY_FILE = "shivai_memory.json"
 
 def load_memory():
     if os.path.exists(MEMORY_FILE):
-        with open(MEMORY_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {"notes": [], "permissions": {"save_memory": True, "voice_reply": True, "web_search": True}}
+        try:
+            with open(MEMORY_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {"notes": [], "permissions": {"save_memory": True, "voice_reply": True, "web_search": False}}
 
 def save_memory(data):
     with open(MEMORY_FILE, "w", encoding="utf-8") as f:
@@ -34,12 +42,51 @@ def save_memory(data):
 memory_data = load_memory()
 
 # ==========================================
-# 2. PAGE SETUP (PHONE + LAPTOP UI)
+# 2. SMART AUTO-FALLBACK ENGINE (Crash Proof)
 # ==========================================
-st.set_page_config(page_title="SHIVAI", page_icon="🧠", layout="wide")
+AVAILABLE_MODELS = [
+    "gemini-3.0-flash",
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash"
+]
 
-st.title("SHIVAI")
-st.caption("*Your Mind. Your AI. Your Future.* | **Owner:** Shivam")
+def ask_shivai(contents, system_prompt=None, use_search=False):
+    last_error = ""
+    
+    # Pehle bina search ya search ke sath models try karega
+    for model_name in AVAILABLE_MODELS:
+        try:
+            tools = [{"google_search": {}}] if use_search else None
+            config = types.GenerateContentConfig(
+                system_instruction=system_prompt,
+                tools=tools
+            )
+            res = client.models.generate_content(
+                model=model_name,
+                contents=contents,
+                config=config
+            )
+            if res and res.text:
+                return res.text
+        except Exception as e:
+            last_error = str(e)
+            # Agar search tool ki wajah se 429 quota error aaye, toh turant bina search ke jawab dega
+            if use_search:
+                try:
+                    config_no_search = types.GenerateContentConfig(system_instruction=system_prompt)
+                    res = client.models.generate_content(
+                        model=model_name,
+                        contents=contents,
+                        config=config_no_search
+                    )
+                    if res and res.text:
+                        return res.text
+                except Exception as e2:
+                    last_error = str(e2)
+            continue
+            
+    return f"⚠️ Free API Key ki 1-minute limit abhi puri ho gayi hai. Kripya 30 second ruk kar dobara message bhejein.\n\n*(Error Info: {last_error})*"
 
 # ==========================================
 # 3. SIDEBAR: BRAIN ROUTER, PRIVACY & MEMORY
@@ -59,7 +106,7 @@ with st.sidebar:
 
     st.divider()
     st.header("🔐 2. Privacy & Permissions")
-    perm_search = st.toggle("🌐 Allow Live Internet Search", value=memory_data["permissions"].get("web_search", True))
+    perm_search = st.toggle("🌐 Allow Live Internet Search", value=False)
     perm_voice = st.toggle("🎙️ Enable Voice Audio Reply", value=memory_data["permissions"].get("voice_reply", True))
     perm_memory = st.toggle("🧠 Allow Personal Memory Access", value=memory_data["permissions"].get("save_memory", True))
 
@@ -95,11 +142,11 @@ with st.sidebar:
 # 4. DYNAMIC SYSTEM INSTRUCTIONS
 # ==========================================
 mode_instructions = {
-    "♊ All-Rounder & Live Search (Gemini Mode)": "Act as a fast, multimodal assistant with real-time internet knowledge.",
-    "🧠 Deep Reasoning & Problem Solving (ChatGPT Mode)": "Think step-by-step using deep logic, first-principles reasoning, and structured problem-solving.",
-    "🟣 Advanced Coding & Writing (Claude Mode)": "Write clean, production-ready, bug-free code with detailed explanations, and craft high-quality, articulate writing.",
-    "🔬 Deep Research Report Generator": "Conduct exhaustive multi-source analysis. Structure your answer with an Executive Summary, Key Findings, Data Breakdown, and Verified Sources.",
-    "💼 Personal Business & Data Advisor": "Analyse business ideas, calculate ROI, sales, expenses, profit margins, and give practical financial & strategic advice."
+    "♊ All-Rounder & Live Search (Gemini Mode)": "Act as a fast, helpful multimodal assistant.",
+    "🧠 Deep Reasoning & Problem Solving (ChatGPT Mode)": "Think step-by-step using deep logic and structured problem-solving.",
+    "🟣 Advanced Coding & Writing (Claude Mode)": "Write clean, bug-free code with detailed explanations.",
+    "🔬 Deep Research Report Generator": "Conduct exhaustive analysis with Executive Summary and Key Findings.",
+    "💼 Personal Business & Data Advisor": "Analyse business ideas, ROI, and give practical financial advice."
 }
 
 saved_context = json.dumps(memory_data["notes"], ensure_ascii=False) if perm_memory else "Memory access disabled."
@@ -120,7 +167,7 @@ Shivam's Saved Personal Memory:
 """
 
 # ==========================================
-# 5. WORKSPACE TABS (CHAT, VOICE, FILES, AUTOMATION)
+# 5. WORKSPACE TABS
 # ==========================================
 tab_chat, tab_files, tab_auto = st.tabs([
     "💬 Chat & 🎙️ Voice AI", 
@@ -165,22 +212,12 @@ with tab_chat:
             st.markdown(display_text)
 
         with st.chat_message("assistant"):
-            with st.spinner(f"SHIVAI ({brain_mode.split('(')[0]}) soch raha hai..."):
-                tools_list = [{"google_search": {}}] if perm_search else []
-                
-                response = client.models.generate_content(
-                    model="gemini-3.8-flash",
-                    contents=active_contents,
-                    config=types.GenerateContentConfig(
-                        system_instruction=SYSTEM_PROMPT,
-                        tools=tools_list,
-                    ),
-                )
-                reply = response.text
+            with st.spinner("SHIVAI soch raha hai..."):
+                reply = ask_shivai(active_contents, system_prompt=SYSTEM_PROMPT, use_search=perm_search)
                 st.markdown(reply)
                 st.session_state.messages.append({"role": "assistant", "content": reply})
 
-                if perm_voice and reply:
+                if perm_voice and reply and not reply.startswith("⚠️"):
                     try:
                         clean_speech = reply.replace("*", "").replace("#", "")[:500]
                         tts = gTTS(text=clean_speech, lang="hi")
@@ -203,78 +240,48 @@ with tab_files:
             df = pd.read_csv(uploaded_file) if file_ext == "csv" else pd.read_excel(uploaded_file)
             st.write("### 📊 Data Preview:")
             st.dataframe(df.head(10))
-            
-            st.write("### 📈 Quick Statistical Summary:")
-            st.write(df.describe())
-
             if st.button("🧠 Analyse Data with SHIVAI"):
                 with st.spinner("SHIVAI data analyse kar raha hai..."):
-                    data_summary = f"Columns: {list(df.columns)}\nSample Data:\n{df.head(20).to_string()}\nStats:\n{df.describe().to_string()}"
-                    res = client.models.generate_content(
-                        model="gemini-3.8-flash",
-                        contents=f"{file_question}\n\nData:\n{data_summary}",
-                        config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT)
-                    )
-                    st.markdown(res.text)
+                    data_summary = f"Columns: {list(df.columns)}\nSample:\n{df.head(15).to_string()}\nStats:\n{df.describe().to_string()}"
+                    reply = ask_shivai(f"{file_question}\n\nData:\n{data_summary}", system_prompt=SYSTEM_PROMPT)
+                    st.markdown(reply)
 
         elif file_ext in ["png", "jpg", "jpeg"]:
             img = Image.open(uploaded_file)
             st.image(img, caption="Uploaded Image", width=350)
             if st.button("🧠 Analyse Image with SHIVAI"):
                 with st.spinner("SHIVAI image dekh raha hai..."):
-                    res = client.models.generate_content(
-                        model="gemini-3.8-flash",
-                        contents=[img, file_question],
-                        config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT)
-                    )
-                    st.markdown(res.text)
+                    reply = ask_shivai([img, file_question], system_prompt=SYSTEM_PROMPT)
+                    st.markdown(reply)
 
         elif file_ext == "pdf":
             reader = PdfReader(uploaded_file)
-            pdf_text = ""
-            for page in reader.pages[:15]:
-                pdf_text += page.extract_text() or ""
+            pdf_text = "".join([page.extract_text() or "" for page in reader.pages[:15]])
             st.success(f"PDF Loaded ({len(reader.pages)} pages)")
             if st.button("🧠 Analyse PDF with SHIVAI"):
                 with st.spinner("SHIVAI PDF padh raha hai..."):
-                    res = client.models.generate_content(
-                        model="gemini-3.8-flash",
-                        contents=f"{file_question}\n\nDocument Content:\n{pdf_text[:20000]}",
-                        config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT)
-                    )
-                    st.markdown(res.text)
+                    reply = ask_shivai(f"{file_question}\n\nContent:\n{pdf_text[:20000]}", system_prompt=SYSTEM_PROMPT)
+                    st.markdown(reply)
 
 # --- TAB 3: TASK AUTOMATION ---
 with tab_auto:
     st.subheader("⚙️ Permission-Based Digital Automation")
-    st.write("SHIVAI aapki permission ke bina koi action nahi lega.")
-    
     task_type = st.selectbox("Select Automation Task:", [
         "📝 Generate & Save Report to File (.txt / .md)",
         "💻 Generate Python Automation Script",
         "📅 Create Daily Study / Business Action Plan"
     ])
-    
-    task_detail = st.text_area("Task ki detail likhein (e.g., 'AI startup ke liye 30 days ka plan banao'):")
+    task_detail = st.text_area("Task ki detail likhein:")
     confirm_permission = st.checkbox("✅ Main SHIVAI ko ye task execute karne ki permission deta hun.")
 
     if st.button("🚀 Execute Task"):
         if not confirm_permission:
-            st.error("⚠️ Permission Denied! Pehle checkbox par tick karke permission dein.")
+            st.error("⚠️ Pehle checkbox par tick karke permission dein.")
         elif not task_detail:
             st.warning("Pehle task ki detail likhein.")
         else:
             with st.spinner("SHIVAI task execute kar raha hai..."):
-                res = client.models.generate_content(
-                    model="gemini-3.8-flash",
-                    contents=f"Task Type: {task_type}\nDetails: {task_detail}\nExecute this thoroughly.",
-                    config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT)
-                )
-                st.success("✅ Task Completed Successfully!")
-                st.markdown(res.text)
-                st.download_button(
-                    label="📥 Download Output File",
-                    data=res.text,
-                    file_name="shivai_output.md",
-                    mime="text/markdown"
-                )
+                reply = ask_shivai(f"Task Type: {task_type}\nDetails: {task_detail}\nExecute thoroughly.", system_prompt=SYSTEM_PROMPT)
+                st.success("✅ Task Completed!")
+                st.markdown(reply)
+                st.download_button("📥 Download Output File", data=reply, file_name="shivai_output.md", mime="text/markdown")
