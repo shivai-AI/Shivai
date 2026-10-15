@@ -278,7 +278,7 @@ with tab_auto:
                     file_name="shivai_output.md",
                     mime="text/markdown"
                 )
-HIVAI PDF padh raha hai..."):
+SHIVAI PDF padh raha hai..."):
                     res = client.models.generate_content(
                         model="gemini-2.5-flash",
                         contents=f"{file_question}\n\nDocument Content:\n{pdf_text[:20000]}",
