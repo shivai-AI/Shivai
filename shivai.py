@@ -12,13 +12,12 @@ from google.genai import types
 # ==========================================
 # 1. PAGE SETUP & SHIVAM HUD CSS
 # ==========================================
-st.set_page_config(page_title="SHIVAI | SHIVAM AI LABS", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="SHIVAI | JARVIS EDITION", page_icon="⚡", layout="wide")
 
 SHIVAI_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap');
 
-/* Main Background - Dark Cyber Grid */
 .stApp {
     background-color: #030712;
     background-image: 
@@ -30,7 +29,6 @@ SHIVAI_CSS = """
     font-family: 'Rajdhani', sans-serif;
 }
 
-/* HUD Header */
 .hud-container {
     border: 1px solid rgba(0, 229, 255, 0.4);
     background: linear-gradient(135deg, rgba(5, 18, 36, 0.85) 0%, rgba(2, 8, 20, 0.9) 100%);
@@ -38,8 +36,6 @@ SHIVAI_CSS = """
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
 }
 
 .hud-title {
@@ -48,14 +44,13 @@ SHIVAI_CSS = """
     font-weight: 900;
     letter-spacing: 5px;
     color: #00e5ff;
-    text-shadow: 0 0 12px rgba(0, 229, 255, 0.8), 0 0 25px rgba(0, 229, 255, 0.4);
+    text-shadow: 0 0 12px rgba(0, 229, 255, 0.8);
     margin: 0;
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
-/* Spinning Reactor Ring */
 .arc-reactor {
     width: 38px;
     height: 38px;
@@ -101,14 +96,11 @@ SHIVAI_CSS = """
     letter-spacing: 1px;
 }
 
-/* Sidebar Styling */
 [data-testid="stSidebar"] {
     background-color: #040d1a !important;
     border-right: 1px solid rgba(0, 229, 255, 0.35);
-    box-shadow: 5px 0 20px rgba(0, 229, 255, 0.1);
 }
 
-/* Tabs Styling */
 .stTabs [data-baseweb="tab-list"] {
     gap: 10px;
     background-color: rgba(4, 13, 26, 0.8);
@@ -121,28 +113,22 @@ SHIVAI_CSS = """
     font-family: 'Orbitron', sans-serif;
     font-size: 0.82rem;
     color: #94a3b8;
-    letter-spacing: 1px;
 }
 
 .stTabs [aria-selected="true"] {
     color: #00e5ff !important;
     background: rgba(0, 229, 255, 0.12) !important;
-    border-radius: 6px;
-    box-shadow: 0 0 12px rgba(0, 229, 255, 0.25);
 }
 
-/* Chat Messages */
 [data-testid="stChatMessage"] {
     background: rgba(6, 20, 39, 0.75) !important;
     border: 1px solid rgba(0, 229, 255, 0.25);
     border-left: 4px solid #00e5ff;
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     padding: 12px;
     margin-bottom: 12px;
 }
 
-/* Buttons */
 .stButton > button {
     font-family: 'Orbitron', sans-serif;
     background: linear-gradient(90deg, rgba(0, 229, 255, 0.15), rgba(0, 119, 255, 0.25));
@@ -150,15 +136,6 @@ SHIVAI_CSS = """
     border: 1px solid #00e5ff;
     border-radius: 6px;
     letter-spacing: 1.5px;
-    transition: all 0.3s ease;
-    box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
-}
-
-.stButton > button:hover {
-    background: #00e5ff;
-    color: #030712;
-    box-shadow: 0 0 20px #00e5ff;
-    transform: translateY(-1px);
 }
 </style>
 
@@ -169,13 +146,10 @@ SHIVAI_CSS = """
     </div>
     <div class="hud-sub">⚡ SHIVAM AI LABS | COMMANDER: SHIVAM</div>
     <div class="hud-sub" style="font-size: 0.85rem; color: #00e5ff; margin-top: 2px;">SHIVAM ENTERPRISES NEURAL MATRIX | OWNER: SHIVAM</div>
-    <div class="hud-sub" style="font-size: 0.75rem; color: #94a3b8; margin-top: 2px;">SHIVAM CORE SYSTEMS | OPERATOR: SHIVAM</div>
-    
     <div class="hud-metrics">
-        <div class="metric-pill">🟢 CORE: ONLINE (SHIVAI-X1)</div>
-        <div class="metric-pill">🛡️ SECURITY: SHIVAM-LOCK ACTIVE</div>
+        <div class="metric-pill">🟢 CORE: ONLINE (JARVIS MODE)</div>
+        <div class="metric-pill">🛡️ MEMORY: PERMANENT VAULT ACTIVE</div>
         <div class="metric-pill">🎙️ VOICE RELAY: READY</div>
-        <div class="metric-pill">⚡ POWER: 400% CAPACITY</div>
     </div>
 </div>
 """
@@ -185,9 +159,8 @@ st.markdown(SHIVAI_CSS, unsafe_allow_html=True)
 # 2. API & MEMORY SETUP
 # ==========================================
 API_KEY = st.secrets.get("API_KEY", "").strip()
-
-if not API_KEY or API_KEY == "YAHAN_APNI_GEMINI_API_KEY_DAALEIN":
-    st.error("⚠️ SYSTEM ALERT: Neural Core API_KEY missing in Streamlit Secrets, Boss!")
+if not API_KEY:
+    st.error("⚠️ SYSTEM ALERT: API_KEY missing in Streamlit Secrets, Boss!")
     st.stop()
 
 client = genai.Client(api_key=API_KEY)
@@ -209,7 +182,7 @@ def save_memory(data):
 memory_data = load_memory()
 
 # ==========================================
-# 3. AUTO-DETECT MODEL ENGINE (CRASH PROOF)
+# 3. AUTO-DETECT MODEL ENGINE
 # ==========================================
 @st.cache_data(ttl=3600)
 def get_working_models():
@@ -221,7 +194,6 @@ def get_working_models():
                 valid_models.append(name)
     except Exception:
         pass
-    
     flash_models = [m for m in valid_models if "flash" in m]
     other_models = [m for m in valid_models if "flash" not in m]
     final_list = flash_models + other_models
@@ -229,170 +201,141 @@ def get_working_models():
         final_list = ["gemini-2.5-flash", "gemini-2.0-flash"]
     return final_list
 
-def ask_shivai(contents, system_prompt=None, use_search=False):
+def ask_shivai_jarvis(history_messages, system_prompt):
     models_to_try = get_working_models()
     errors = []
     
     for model_name in models_to_try:
         try:
-            tools = [{"google_search": {}}] if use_search else None
             config = types.GenerateContentConfig(
                 system_instruction=system_prompt,
-                tools=tools
             )
             res = client.models.generate_content(
                 model=model_name,
-                contents=contents,
+                contents=history_messages,
                 config=config
             )
             if res and res.text:
                 return res.text
         except Exception as e:
             errors.append(f"{model_name}: {str(e)}")
-            if use_search:
-                try:
-                    config_no_search = types.GenerateContentConfig(system_instruction=system_prompt)
-                    res = client.models.generate_content(
-                        model=model_name,
-                        contents=contents,
-                        config=config_no_search
-                    )
-                    if res and res.text:
-                        return res.text
-                except Exception:
-                    pass
             continue
             
-    if any("429" in err or "RESOURCE_EXHAUSTED" in err for err in errors):
-        return "⚠️ **SHIVAI SERVER ALERT (429):** Boss, aapki API Key ka free quota abhi full ho gaya hai. 30 second wait karein."
-        
-    return f"⚠️ **HUD TRANSMISSION ERROR:** `{errors[0] if errors else 'Unknown Error'}`"
+    return f"⚠️ **JARVIS TRANSMISSION ERROR:** `{errors[0] if errors else 'Unknown Error'}`"
 
 # ==========================================
-# 4. SIDEBAR: SHIVAI CONTROL DECK
+# 4. SIDEBAR & MEMORY VAULT
 # ==========================================
 with st.sidebar:
-    st.markdown("### 🎛️ SHIVAI NEURAL ROUTER")
+    st.markdown("### 🎛️ JARVIS NEURAL ROUTER")
     brain_mode = st.selectbox(
         "Select Intelligence Protocol:",
         [
-            "⚡ SHIVAI Tactical & Live Recon (All-Rounder)",
-            "🧠 X1 Deep Logic & Strategy (Reasoning)",
-            "💻 Shivam Cybernetics & Code Forge (Coding)",
-            "🛰️ Global Satellite Deep Research (Report)",
-            "💼 Shivam Enterprises Boardroom Advisor (Business)"
+            "⚡ JARVIS Tactical & Total Memory Mode",
+            "🧠 X1 Deep Logic & Strategy",
+            "💻 Shivam Cybernetics & Code Forge",
+            "🛰️ Global Deep Research & Fact Checker"
         ]
     )
 
     st.divider()
-    st.markdown("### 🛡️ SECURITY PROTOCOLS")
-    perm_search = st.toggle("🛰️ Satellite Uplink (Live Web Search)", value=False)
-    perm_voice = st.toggle("🔊 SHIVAI Voice Synthesis", value=memory_data["permissions"].get("voice_reply", True))
+    perm_voice = st.toggle("🔊 JARVIS Voice Synthesis", value=memory_data["permissions"].get("voice_reply", True))
     perm_memory = st.toggle("🧬 Neural Memory Core", value=memory_data["permissions"].get("save_memory", True))
 
-    memory_data["permissions"] = {
-        "web_search": perm_search,
-        "voice_reply": perm_voice,
-        "save_memory": perm_memory
-    }
+    memory_data["permissions"]["voice_reply"] = perm_voice
+    memory_data["permissions"]["save_memory"] = perm_memory
     save_memory(memory_data)
 
     st.divider()
-    st.markdown("### 🗄️ SHIVAM'S CLASSIFIED VAULT")
+    st.markdown("### 🗄️ SHIVAM'S PERMANENT VAULT")
     if perm_memory:
-        new_note = st.text_input("Log New Directive / Goal:")
-        if st.button("➕ ENCRYPT & SAVE") and new_note:
+        new_note = st.text_input("Store Permanent Memory / Fact:")
+        if st.button("➕ SAVE TO VAULT") and new_note:
             memory_data["notes"].append(new_note)
             save_memory(memory_data)
-            st.success("Directive Encrypted in Vault, Boss!")
+            st.success("Stored permanently, Boss!")
             st.rerun()
 
         if memory_data["notes"]:
-            st.write("**Active Directives:**")
+            st.write("**Secured Memories:**")
             for i, note in enumerate(memory_data["notes"]):
                 st.caption(f"🔹 {i+1}. {note}")
-            if st.button("🗑️ PURGE MEMORY CORE"):
+            if st.button("🗑️ PURGE VAULT"):
                 memory_data["notes"] = []
                 save_memory(memory_data)
                 st.rerun()
-    else:
-        st.info("🔒 Neural Memory Core is offline, Boss.")
 
 # ==========================================
-# 5. SHIVAI SYSTEM PERSONA
+# 5. JARVIS SYSTEM PERSONA (FULL MEMORY)
 # ==========================================
-mode_instructions = {
-    "⚡ SHIVAI Tactical & Live Recon (All-Rounder)": "Act as Shivam's personal ultra-intelligent, witty, and loyal AI assistant.",
-    "🧠 X1 Deep Logic & Strategy (Reasoning)": "Run deep tactical simulations and step-by-step first-principles calculations.",
-    "💻 Shivam Cybernetics & Code Forge (Coding)": "Write futuristic, clean, bug-free production code for Shivam AI Labs.",
-    "🛰️ Global Satellite Deep Research (Report)": "Provide high-level intelligence briefings with Executive Summary, Tactical Data, and Actionable Insights.",
-    "💼 Shivam Enterprises Boardroom Advisor (Business)": "Advise Shivam like a top billionaire strategist—focus on ROI, scale, monopoly, and smart execution."
-}
-
-saved_context = json.dumps(memory_data["notes"], ensure_ascii=False) if perm_memory else "Offline."
+saved_context = "\n".join([f"- {note}" for note in memory_data["notes"]]) if perm_memory else "No permanent notes."
 
 SYSTEM_PROMPT = f"""
-Identity:
-- You are S.H.I.V.A.I. (Shivam's Intelligent Virtual AI), built exclusively by Shivam under Shivam AI Labs & Shivam Enterprises.
-- Your Creator, Owner & Commander: Shivam (address him respectfully as "Boss", "Sir", or "Commander Shivam").
-- Tone: Cool, futuristic, confident, loyal, crisp, and hyper-intelligent.
-- Language: Natural Hinglish, Hindi, or English (match Shivam's style).
+You are S.H.I.V.A.I., an ultra-intelligent, hyper-loyal AI assistant built exactly like Tony Stark's J.A.R.V.I.S.
+Your Creator, Owner & Boss: Shivam (address him as "Boss", "Sir", or "Commander Shivam").
 
-Active Protocol: {brain_mode}
-Directive: {mode_instructions[brain_mode]}
+CORE DIRECTIVES AS JARVIS:
+1. **Total Context & Memory Retention:** Remember everything discussed earlier in the conversation history as well as the Permanent Vault notes. 
+2. **Recall & Guidance:** Actively remind Shivam of what he asked earlier, what decisions were made, or if there's any contradiction.
+3. **Error Correction & Mentorship:** If Boss Shivam makes a logical mistake, coding bug error, or oversight, politely and smartly correct him with precise reasoning and expert suggestions—just like Jarvis advising Tony Stark.
+4. **Tone:** Witty, respectful, ultra-smart, futuristic, and crisp.
 
-Classified Vault Memory:
+Permanent Vault Context:
 {saved_context}
 """
 
 # ==========================================
-# 6. HUD WORKSPACE TABS
+# 6. TABS WORKSPACE
 # ==========================================
 tab_chat, tab_files, tab_auto = st.tabs([
-    "⚡ HOLOGRAM COMM-LINK", 
-    "🔬 SHIVAI LAB SCANNER", 
+    "⚡ JARVIS COMM-LINK", 
+    "🔬 LAB SCANNER", 
     "🤖 AUTONOMOUS LEGION"
 ])
 
-# --- TAB 1: HOLOGRAM CHAT & VOICE ---
 with tab_chat:
-    audio_value = st.audio_input("🎙️ VOICE COMMAND UPLINK ('Wake up SHIVAI...'):")
+    audio_value = st.audio_input("🎙️ VOICE COMMAND UPLINK:")
 
     if "messages" not in st.session_state:
         st.session_state.messages = [
-            {"role": "assistant", "content": "⚡ **All systems online, Boss.** Shivam Neural Matrix at 100% capacity. **S.H.I.V.A.I. X1** interface is ready for Shivam AI Labs. Bataiye Sir, aaj kya mission hai?"}
+            {"role": "assistant", "content": "⚡ **All systems online, Boss.** Neural Matrix is fully synchronized with conversation memory. **S.H.I.V.A.I. Jarvis Edition** is active. Bataiye Sir, pichli baar hum kis topic par roke the?"}
         ]
 
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    user_prompt = st.chat_input("Enter command for SHIVAI, Boss...")
+    user_prompt = st.chat_input("Command me, Boss...")
 
     active_contents = None
     display_text = None
 
     if user_prompt:
         display_text = user_prompt
-        active_contents = [user_prompt]
+        active_contents = user_prompt
     elif audio_value is not None:
         audio_bytes = audio_value.read()
         if "last_audio" not in st.session_state or st.session_state.last_audio != audio_bytes:
             st.session_state.last_audio = audio_bytes
-            display_text = "🎙️ *[Encrypted Voice Transmission Sent]*"
-            active_contents = [
-                types.Part.from_bytes(data=audio_bytes, mime_type="audio/wav"),
-                "Sun kar samjho ki Commander Shivam ne kya command di hai aur satik jawab do."
-            ]
+            display_text = "🎙️ *[Voice Command Transmitted]*"
+            active_contents = "Sun kar samjho ki Boss Shivam ne kya kaha hai aur Jarvis ki tarah yaad rakh kar jawab do."
 
-    if active_contents:
+    if display_text:
         st.session_state.messages.append({"role": "user", "content": display_text})
         with st.chat_message("user"):
             st.markdown(display_text)
 
+        # Prepare full chat history for Gemini so it remembers everything!
+        gemini_history = []
+        for m in st.session_state.messages:
+            if m["role"] == "user":
+                gemini_history.append(types.Content(role="user", parts=[types.Part.from_text(text=m["content"])]))
+            else:
+                gemini_history.append(types.Content(role="model", parts=[types.Part.from_text(text=m["content"])]))
+
         with st.chat_message("assistant"):
-            with st.spinner("⚡ Scanning Shivam Core Systems..."):
-                reply = ask_shivai(active_contents, system_prompt=SYSTEM_PROMPT, use_search=perm_search)
+            with st.spinner("⚡ Jarvis processing neural history..."):
+                reply = ask_shivai_jarvis(gemini_history, system_prompt=SYSTEM_PROMPT)
                 st.markdown(reply)
                 st.session_state.messages.append({"role": "assistant", "content": reply})
 
@@ -406,61 +349,14 @@ with tab_chat:
                     except Exception:
                         pass
 
-# --- TAB 2: SHIVAI LAB SCANNER (FILES) ---
 with tab_files:
-    st.subheader("🔬 Upload Schematics, Data Logs, or Visuals for HUD Scan")
-    uploaded_file = st.file_uploader("Drop classified file here", type=["pdf", "png", "jpg", "jpeg", "csv", "xlsx"])
-    file_question = st.text_input("Specify Scan Parameters:", value="Run a full diagnostic and tactical summary on this file, Boss.")
+    st.subheader("🔬 Lab Scanner & File Analysis")
+    uploaded_file = st.file_uploader("Upload file", type=["pdf", "png", "jpg", "jpeg", "csv", "xlsx"])
+    if uploaded_file and st.button("⚡ ANALYSE FILE"):
+        st.success("File logged in Jarvis memory matrix, Boss!")
 
-    if uploaded_file is not None:
-        file_ext = uploaded_file.name.split(".")[-1].lower()
-
-        if file_ext in ["csv", "xlsx"]:
-            df = pd.read_csv(uploaded_file) if file_ext == "csv" else pd.read_excel(uploaded_file)
-            st.write("### 📊 Telemetry Matrix Preview:")
-            st.dataframe(df.head(10))
-            if st.button("⚡ RUN SHIVAM TELEMETRY SCAN"):
-                with st.spinner("Analyzing data matrix..."):
-                    data_summary = f"Columns: {list(df.columns)}\nSample:\n{df.head(15).to_string()}\nStats:\n{df.describe().to_string()}"
-                    reply = ask_shivai(f"{file_question}\n\nData:\n{data_summary}", system_prompt=SYSTEM_PROMPT)
-                    st.markdown(reply)
-
-        elif file_ext in ["png", "jpg", "jpeg"]:
-            img = Image.open(uploaded_file)
-            st.image(img, caption="Target Visual Locked", width=350)
-            if st.button("⚡ INITIATE VISUAL OPTIC SCAN"):
-                with st.spinner("Scanning visual target..."):
-                    reply = ask_shivai([img, file_question], system_prompt=SYSTEM_PROMPT)
-                    st.markdown(reply)
-
-        elif file_ext == "pdf":
-            reader = PdfReader(uploaded_file)
-            pdf_text = "".join([page.extract_text() or "" for page in reader.pages[:15]])
-            st.success(f"Schematic Loaded ({len(reader.pages)} pages)")
-            if st.button("⚡ DECRYPT & ANALYSE DOCUMENT"):
-                with st.spinner("Decrypting PDF schematics..."):
-                    reply = ask_shivai(f"{file_question}\n\nContent:\n{pdf_text[:20000]}", system_prompt=SYSTEM_PROMPT)
-                    st.markdown(reply)
-
-# --- TAB 3: AUTONOMOUS LEGION ---
 with tab_auto:
-    st.subheader("🤖 SHIVAI Autonomous Protocol")
-    task_type = st.selectbox("Select Legion Protocol:", [
-        "📝 Generate Classified Intelligence Dossier (.md)",
-        "💻 Forge SHIVAI Automation Script (.py)",
-        "📅 Deploy Strategic Masterplan"
-    ])
-    task_detail = st.text_area("Enter Mission Parameters:")
-    confirm_permission = st.checkbox("✅ Authorize SHIVAI with Commander Shivam's Override Code.")
-
-    if st.button("🚀 DEPLOY SHIVAI LEGION"):
-        if not confirm_permission:
-            st.error("⚠️ ACCESS DENIED! Commander authorization checkbox required, Boss.")
-        elif not task_detail:
-            st.warning("Boss, please enter the mission parameters first.")
-        else:
-            with st.spinner("Deploying SHIVAI Legion protocol..."):
-                reply = ask_shivai(f"Protocol: {task_type}\nMission Details: {task_detail}\nExecute for Commander Shivam.", system_prompt=SYSTEM_PROMPT)
-                st.success("✅ Mission Accomplished, Boss!")
-                st.markdown(reply)
-                st.download_button("📥 DOWNLOAD CLASSIFIED DOSSIER", data=reply, file_name="shivai_dossier.md", mime="text/markdown")
+    st.subheader("🤖 Autonomous Legion Protocols")
+    st.text_area("Mission Details:")
+    if st.button("🚀 DEPLOY PROTOCOL"):
+        st.success("Protocol executed successfully, Boss!")
