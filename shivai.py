@@ -10,9 +10,9 @@ from google import genai
 from google.genai import types
 
 # ==========================================
-# 1. PAGE SETUP & SHIVAM HUD CSS
+# 1. PAGE SETUP & SHIVAI HUD CSS
 # ==========================================
-st.set_page_config(page_title="SHIVAI | JARVIS EDITION", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="SHIVAI | SHIVAM AI LABS", page_icon="🧠", layout="wide")
 
 SHIVAI_CSS = """
 <style>
@@ -147,7 +147,7 @@ SHIVAI_CSS = """
     <div class="hud-sub">⚡ SHIVAM AI LABS | COMMANDER: SHIVAM</div>
     <div class="hud-sub" style="font-size: 0.85rem; color: #00e5ff; margin-top: 2px;">SHIVAM ENTERPRISES NEURAL MATRIX | OWNER: SHIVAM</div>
     <div class="hud-metrics">
-        <div class="metric-pill">🟢 CORE: ONLINE (JARVIS MODE)</div>
+        <div class="metric-pill">🟢 CORE: ONLINE (SHIVAI-X1)</div>
         <div class="metric-pill">🛡️ MEMORY: PERMANENT VAULT ACTIVE</div>
         <div class="metric-pill">🎙️ VOICE RELAY: READY</div>
     </div>
@@ -201,7 +201,7 @@ def get_working_models():
         final_list = ["gemini-2.5-flash", "gemini-2.0-flash"]
     return final_list
 
-def ask_shivai_jarvis(history_messages, system_prompt):
+def ask_shivai(history_messages, system_prompt):
     models_to_try = get_working_models()
     errors = []
     
@@ -221,17 +221,17 @@ def ask_shivai_jarvis(history_messages, system_prompt):
             errors.append(f"{model_name}: {str(e)}")
             continue
             
-    return f"⚠️ **JARVIS TRANSMISSION ERROR:** `{errors[0] if errors else 'Unknown Error'}`"
+    return f"⚠️ **TRANSMISSION ERROR:** `{errors[0] if errors else 'Unknown Error'}`"
 
 # ==========================================
 # 4. SIDEBAR & MEMORY VAULT
 # ==========================================
 with st.sidebar:
-    st.markdown("### 🎛️ JARVIS NEURAL ROUTER")
+    st.markdown("### 🎛️ SHIVAI NEURAL ROUTER")
     brain_mode = st.selectbox(
         "Select Intelligence Protocol:",
         [
-            "⚡ JARVIS Tactical & Total Memory Mode",
+            "⚡ SHIVAI Tactical & Total Memory Mode",
             "🧠 X1 Deep Logic & Strategy",
             "💻 Shivam Cybernetics & Code Forge",
             "🛰️ Global Deep Research & Fact Checker"
@@ -239,7 +239,7 @@ with st.sidebar:
     )
 
     st.divider()
-    perm_voice = st.toggle("🔊 JARVIS Voice Synthesis", value=memory_data["permissions"].get("voice_reply", True))
+    perm_voice = st.toggle("🔊 SHIVAI Voice Synthesis", value=memory_data["permissions"].get("voice_reply", True))
     perm_memory = st.toggle("🧬 Neural Memory Core", value=memory_data["permissions"].get("save_memory", True))
 
     memory_data["permissions"]["voice_reply"] = perm_voice
@@ -266,18 +266,18 @@ with st.sidebar:
                 st.rerun()
 
 # ==========================================
-# 5. JARVIS SYSTEM PERSONA (FULL MEMORY)
+# 5. SHIVAI SYSTEM PERSONA (FULL MEMORY)
 # ==========================================
 saved_context = "\n".join([f"- {note}" for note in memory_data["notes"]]) if perm_memory else "No permanent notes."
 
 SYSTEM_PROMPT = f"""
-You are S.H.I.V.A.I., an ultra-intelligent, hyper-loyal AI assistant built exactly like Tony Stark's J.A.R.V.I.S.
+You are S.H.I.V.A.I. (Shivam's Intelligent Virtual AI), an ultra-intelligent, hyper-loyal personal AI assistant built exclusively by Shivam under Shivam AI Labs.
 Your Creator, Owner & Boss: Shivam (address him as "Boss", "Sir", or "Commander Shivam").
 
-CORE DIRECTIVES AS JARVIS:
+CORE DIRECTIVES:
 1. **Total Context & Memory Retention:** Remember everything discussed earlier in the conversation history as well as the Permanent Vault notes. 
 2. **Recall & Guidance:** Actively remind Shivam of what he asked earlier, what decisions were made, or if there's any contradiction.
-3. **Error Correction & Mentorship:** If Boss Shivam makes a logical mistake, coding bug error, or oversight, politely and smartly correct him with precise reasoning and expert suggestions—just like Jarvis advising Tony Stark.
+3. **Error Correction & Mentorship:** If Boss Shivam makes a logical mistake, coding bug error, or oversight, politely and smartly correct him with precise reasoning and expert suggestions.
 4. **Tone:** Witty, respectful, ultra-smart, futuristic, and crisp.
 
 Permanent Vault Context:
@@ -288,7 +288,7 @@ Permanent Vault Context:
 # 6. TABS WORKSPACE
 # ==========================================
 tab_chat, tab_files, tab_auto = st.tabs([
-    "⚡ JARVIS COMM-LINK", 
+    "⚡ COMM-LINK", 
     "🔬 LAB SCANNER", 
     "🤖 AUTONOMOUS LEGION"
 ])
@@ -298,7 +298,7 @@ with tab_chat:
 
     if "messages" not in st.session_state:
         st.session_state.messages = [
-            {"role": "assistant", "content": "⚡ **All systems online, Boss.** Neural Matrix is fully synchronized with conversation memory. **S.H.I.V.A.I. Jarvis Edition** is active. Bataiye Sir, pichli baar hum kis topic par roke the?"}
+            {"role": "assistant", "content": "⚡ **All systems online, Boss.** Neural Matrix is fully synchronized with conversation memory. **S.H.I.V.A.I. X1** is active. Bataiye Sir, pichli baar hum kis topic par roke the?"}
         ]
 
     for msg in st.session_state.messages:
@@ -318,14 +318,13 @@ with tab_chat:
         if "last_audio" not in st.session_state or st.session_state.last_audio != audio_bytes:
             st.session_state.last_audio = audio_bytes
             display_text = "🎙️ *[Voice Command Transmitted]*"
-            active_contents = "Sun kar samjho ki Boss Shivam ne kya kaha hai aur Jarvis ki tarah yaad rakh kar jawab do."
+            active_contents = "Sun kar samjho ki Boss Shivam ne kya kaha hai aur yaad rakh kar jawab do."
 
     if display_text:
         st.session_state.messages.append({"role": "user", "content": display_text})
         with st.chat_message("user"):
             st.markdown(display_text)
 
-        # Prepare full chat history for Gemini so it remembers everything!
         gemini_history = []
         for m in st.session_state.messages:
             if m["role"] == "user":
@@ -334,8 +333,8 @@ with tab_chat:
                 gemini_history.append(types.Content(role="model", parts=[types.Part.from_text(text=m["content"])]))
 
         with st.chat_message("assistant"):
-            with st.spinner("⚡ Jarvis processing neural history..."):
-                reply = ask_shivai_jarvis(gemini_history, system_prompt=SYSTEM_PROMPT)
+            with st.spinner("⚡ Processing neural history..."):
+                reply = ask_shivai(gemini_history, system_prompt=SYSTEM_PROMPT)
                 st.markdown(reply)
                 st.session_state.messages.append({"role": "assistant", "content": reply})
 
@@ -353,10 +352,10 @@ with tab_files:
     st.subheader("🔬 Lab Scanner & File Analysis")
     uploaded_file = st.file_uploader("Upload file", type=["pdf", "png", "jpg", "jpeg", "csv", "xlsx"])
     if uploaded_file and st.button("⚡ ANALYSE FILE"):
-        st.success("File logged in Jarvis memory matrix, Boss!")
+        st.success("File logged in memory matrix, Boss!")
 
 with tab_auto:
-    st.subheader("🤖 Autonomous Legion Protocols")
+    st.subheader("🤖 Autonomous Protocols")
     st.text_area("Mission Details:")
     if st.button("🚀 DEPLOY PROTOCOL"):
         st.success("Protocol executed successfully, Boss!")
