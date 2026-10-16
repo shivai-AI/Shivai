@@ -8,6 +8,7 @@ from PIL import Image
 from gtts import gTTS
 from google import genai
 from google.genai import types
+import streamlit.components.v1 as components
 
 # ==========================================
 # 1. PAGE SETUP & SHIVAI HUD CSS
@@ -147,9 +148,9 @@ SHIVAI_CSS = """
     <div class="hud-sub">⚡ SHIVAM AI LABS | COMMANDER: SHIVAM</div>
     <div class="hud-sub" style="font-size: 0.85rem; color: #00e5ff; margin-top: 2px;">SHIVAM ENTERPRISES NEURAL MATRIX | OWNER: SHIVAM</div>
     <div class="hud-metrics">
-        <div class="metric-pill">🟢 CORE: ONLINE (SHIVAI-X1)</div>
+        <div class="metric-pill">🟢 CORE: ONLINE (HANDS-FREE READY)</div>
         <div class="metric-pill">🛡️ MEMORY: PERMANENT VAULT ACTIVE</div>
-        <div class="metric-pill">🎙️ VOICE RELAY: READY</div>
+        <div class="metric-pill">🎙️ WAKE WORD: 'HEY SHIVAI'</div>
     </div>
 </div>
 """
@@ -266,7 +267,7 @@ with st.sidebar:
                 st.rerun()
 
 # ==========================================
-# 5. SHIVAI SYSTEM PERSONA (FULL MEMORY)
+# 5. SYSTEM PERSONA
 # ==========================================
 saved_context = "\n".join([f"- {note}" for note in memory_data["notes"]]) if perm_memory else "No permanent notes."
 
@@ -294,11 +295,63 @@ tab_chat, tab_files, tab_auto = st.tabs([
 ])
 
 with tab_chat:
-    audio_value = st.audio_input("🎙️ VOICE COMMAND UPLINK:")
+    # Hands-Free Voice Listener Widget via Browser Speech Recognition
+    voice_html = """
+    <div style="background: rgba(0, 229, 255, 0.08); border: 1px solid #00e5ff; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px;">
+        <h4 style="color: #00e5ff; font-family: 'Orbitron', sans-serif; margin: 0 0 10px 0;">🎙️ HANDS-FREE VOICE MATRIX</h4>
+        <p style="color: #f59e0b; font-size: 0.9rem; margin-bottom: 10px;">'Hey Shivai' ya 'Wake up Shivai' bolein, ya button daba kar baat karein.</p>
+        <button id="start-btn" onclick="startListening()" style="background: #00e5ff; color: #030712; border: none; padding: 10px 20px; font-family: 'Orbitron', sans-serif; font-weight: bold; border-radius: 5px; cursor: pointer; box-shadow: 0 0 10px #00e5ff;">🔴 START HANDS-FREE MIC</button>
+        <p id="transcript-box" style="color: #e0f7fa; font-style: italic; margin-top: 10px;"></p>
+    </div>
+
+    <script>
+    function startListening() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("Browser support nahi karta, Boss!");
+            return;
+        }
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'hi-IN';
+        recognition.continuous = true;
+        recognition.interimResults = true;
+
+        document.getElementById("transcript-box").innerText = "Listening for 'Hey Shivai' or commands...";
+        
+        recognition.onresult = function(event) {
+            let transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
+            document.getElementById("transcript-box").innerText = "Detected: " + transcript;
+            
+            if (transcript.includes("hey shivai") || transcript.includes("wake up shivai") || transcript.includes("shivai")) {
+                // Send to streamlit input or trigger action
+                const inputEl = window.parent.document.querySelector('input[aria-label*="Command"]');
+                if (inputEl) {
+                    inputEl.value = transcript;
+                    inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                    // Press Enter
+                    inputEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
+                }
+            }
+        };
+
+        recognition.onerror = function(event) {
+            console.log("Mic error:", event.error);
+        };
+
+        recognition.onend = function() {
+            // Restart automatically for true hands-free loop
+            try { recognition.start(); } catch(e) {}
+        };
+
+        recognition.start();
+    }
+    </script>
+    """
+    components.html(voice_html, height=180)
 
     if "messages" not in st.session_state:
         st.session_state.messages = [
-            {"role": "assistant", "content": "⚡ **All systems online, Boss.** Neural Matrix is fully synchronized with conversation memory. **S.H.I.V.A.I. X1** is active. Bataiye Sir, pichli baar hum kis topic par roke the?"}
+            {"role": "assistant", "content": "⚡ **All systems online, Boss.** Neural Matrix is fully synchronized. **S.H.I.V.A.I. X1** hands-free mode ready. Mic start karne ke liye upar button dabayein!"}
         ]
 
     for msg in st.session_state.messages:
@@ -307,23 +360,10 @@ with tab_chat:
 
     user_prompt = st.chat_input("Command me, Boss...")
 
-    active_contents = None
-    display_text = None
-
     if user_prompt:
-        display_text = user_prompt
-        active_contents = user_prompt
-    elif audio_value is not None:
-        audio_bytes = audio_value.read()
-        if "last_audio" not in st.session_state or st.session_state.last_audio != audio_bytes:
-            st.session_state.last_audio = audio_bytes
-            display_text = "🎙️ *[Voice Command Transmitted]*"
-            active_contents = "Sun kar samjho ki Boss Shivam ne kya kaha hai aur yaad rakh kar jawab do."
-
-    if display_text:
-        st.session_state.messages.append({"role": "user", "content": display_text})
+        st.session_state.messages.append({"role": "user", "content": user_prompt})
         with st.chat_message("user"):
-            st.markdown(display_text)
+            st.markdown(user_prompt)
 
         gemini_history = []
         for m in st.session_state.messages:
