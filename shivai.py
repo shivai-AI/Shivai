@@ -11,157 +11,160 @@ from google.genai import types
 import streamlit.components.v1 as components
 
 # ==========================================
-# 1. PAGE SETUP & SHIVAI HUD CSS
+# 1. PAGE SETUP & BLUEPRINT v1.0 UI SYSTEM
 # ==========================================
-st.set_page_config(page_title="SHIVAI | SHIVAM AI LABS", page_icon="🧠", layout="wide")
+st.set_page_config(page_title="ShivAI — Beyond Intelligence", page_icon="⚡", layout="wide")
 
-SHIVAI_CSS = """
+BLUEPRINT_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap');
 
+/* Blueprint v1.0 Color Tokens */
 .stApp {
-    background-color: #030712;
+    background-color: #050914;
     background-image: 
-        radial-gradient(circle at 50% 10%, rgba(0, 229, 255, 0.12), transparent 60%),
-        linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+        radial-gradient(circle at 50% 10%, rgba(22, 139, 255, 0.12), transparent 60%),
+        linear-gradient(rgba(22, 139, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(22, 139, 255, 0.02) 1px, transparent 1px);
     background-size: 100% 100%, 30px 30px, 30px 30px;
-    color: #e0f7fa;
+    color: #F4F7FF;
     font-family: 'Rajdhani', sans-serif;
 }
 
-.hud-container {
-    border: 1px solid rgba(0, 229, 255, 0.4);
-    background: linear-gradient(135deg, rgba(5, 18, 36, 0.85) 0%, rgba(2, 8, 20, 0.9) 100%);
-    box-shadow: 0 0 25px rgba(0, 229, 255, 0.2), inset 0 0 15px rgba(0, 229, 255, 0.1);
+/* Glass Panels / Cards */
+.shiv-card {
+    background: #0B1628;
+    border: 1px solid rgba(22, 139, 255, 0.25);
     border-radius: 12px;
     padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     margin-bottom: 20px;
 }
 
 .hud-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 2.6rem;
+    font-size: 2.5rem;
     font-weight: 900;
-    letter-spacing: 5px;
-    color: #00e5ff;
-    text-shadow: 0 0 12px rgba(0, 229, 255, 0.8);
+    letter-spacing: 4px;
+    color: #F4F7FF;
     margin: 0;
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
-.arc-reactor {
-    width: 38px;
-    height: 38px;
+/* Glowing Neural Orb / S Core */
+.neural-orb {
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    border: 3px dashed #00e5ff;
-    box-shadow: 0 0 15px #00e5ff, inset 0 0 10px #00e5ff;
-    animation: spin 6s linear infinite;
-    display: inline-block;
+    background: radial-gradient(circle, #168BFF 0%, #8B5CFF 70%, #050914 100%);
+    box-shadow: 0 0 20px #168BFF, inset 0 0 10px #8B5CFF;
+    animation: pulse-orb 4s ease-in-out infinite;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    color: #F4F7FF;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+@keyframes pulse-orb {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 15px #168BFF; }
+    50% { transform: scale(1.08); box-shadow: 0 0 30px #8B5CFF; }
 }
 
-.hud-sub {
+.tagline {
     font-family: 'Rajdhani', sans-serif;
-    color: #f59e0b;
-    font-size: 1.05rem;
-    letter-spacing: 2px;
+    color: #9AAAC4;
+    font-size: 1.1rem;
+    letter-spacing: 3px;
     text-transform: uppercase;
     margin-top: 5px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
-.hud-metrics {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 15px;
-    border-top: 1px solid rgba(0, 229, 255, 0.2);
-    padding-top: 12px;
-}
-
-.metric-pill {
-    background: rgba(0, 229, 255, 0.08);
-    border: 1px solid rgba(0, 229, 255, 0.35);
-    padding: 4px 12px;
-    border-radius: 4px;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.72rem;
-    color: #00e5ff;
-    letter-spacing: 1px;
-}
-
+/* Sidebar */
 [data-testid="stSidebar"] {
-    background-color: #040d1a !important;
-    border-right: 1px solid rgba(0, 229, 255, 0.35);
+    background-color: #050914 !important;
+    border-right: 1px solid rgba(22, 139, 255, 0.2);
 }
 
+/* Tabs */
 .stTabs [data-baseweb="tab-list"] {
     gap: 10px;
-    background-color: rgba(4, 13, 26, 0.8);
+    background-color: #0B1628;
     padding: 8px;
-    border-radius: 8px;
-    border: 1px solid rgba(0, 229, 255, 0.25);
+    border-radius: 10px;
+    border: 1px solid rgba(22, 139, 255, 0.2);
 }
 
 .stTabs [data-baseweb="tab"] {
     font-family: 'Orbitron', sans-serif;
     font-size: 0.82rem;
-    color: #94a3b8;
+    color: #9AAAC4;
+    letter-spacing: 1px;
 }
 
 .stTabs [aria-selected="true"] {
-    color: #00e5ff !important;
-    background: rgba(0, 229, 255, 0.12) !important;
+    color: #F4F7FF !important;
+    background: #168BFF !important;
+    border-radius: 6px;
+    box-shadow: 0 0 15px rgba(22, 139, 255, 0.5);
 }
 
+/* Chat Bubbles */
 [data-testid="stChatMessage"] {
-    background: rgba(6, 20, 39, 0.75) !important;
-    border: 1px solid rgba(0, 229, 255, 0.25);
-    border-left: 4px solid #00e5ff;
-    border-radius: 8px;
-    padding: 12px;
+    background: #0B1628 !important;
+    border: 1px solid rgba(22, 139, 255, 0.2);
+    border-left: 4px solid #168BFF;
+    border-radius: 10px;
+    padding: 15px;
     margin-bottom: 12px;
 }
 
+/* Primary Action Buttons */
 .stButton > button {
     font-family: 'Orbitron', sans-serif;
-    background: linear-gradient(90deg, rgba(0, 229, 255, 0.15), rgba(0, 119, 255, 0.25));
-    color: #00e5ff;
-    border: 1px solid #00e5ff;
+    background: #168BFF;
+    color: #F4F7FF;
+    border: none;
     border-radius: 6px;
+    padding: 8px 18px;
     letter-spacing: 1.5px;
+    box-shadow: 0 0 15px rgba(22, 139, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.stButton > button:hover {
+    background: #8B5CFF;
+    box-shadow: 0 0 25px rgba(139, 92, 255, 0.6);
 }
 </style>
 
-<div class="hud-container">
-    <div class="hud-title">
-        <span class="arc-reactor"></span>
-        S.H.I.V.A.I.
+<div class="shiv-card" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <div class="hud-title">
+            <span class="neural-orb">S</span>
+            ShivAI
+        </div>
+        <div class="tagline">Beyond Intelligence. | Owner: Shivam</div>
     </div>
-    <div class="hud-sub">⚡ SHIVAM AI LABS | COMMANDER: SHIVAM</div>
-    <div class="hud-sub" style="font-size: 0.85rem; color: #00e5ff; margin-top: 2px;">SHIVAM ENTERPRISES NEURAL MATRIX | OWNER: SHIVAM</div>
-    <div class="hud-metrics">
-        <div class="metric-pill">🟢 CORE: ONLINE (HANDS-FREE READY)</div>
-        <div class="metric-pill">🛡️ MEMORY: PERMANENT VAULT ACTIVE</div>
-        <div class="metric-pill">🎙️ WAKE WORD: 'HEY SHIVAI'</div>
+    <div style="text-align: right;">
+        <span style="background: rgba(22, 139, 255, 0.15); border: 1px solid #168BFF; padding: 6px 14px; border-radius: 20px; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; color: #168BFF;">
+            🟢 CORE ONLINE (v1.0)
+        </span>
     </div>
 </div>
 """
-st.markdown(SHIVAI_CSS, unsafe_allow_html=True)
+st.markdown(BLUEPRINT_CSS, unsafe_allow_html=True)
 
 # ==========================================
-# 2. API & MEMORY SETUP
+# 2. API & MEMORY CORE SETUP
 # ==========================================
 API_KEY = st.secrets.get("API_KEY", "").strip()
 if not API_KEY:
-    st.error("⚠️ SYSTEM ALERT: API_KEY missing in Streamlit Secrets, Boss!")
+    st.error("⚠️ CRITICAL: API_KEY missing in Streamlit Secrets, Boss!")
     st.stop()
 
 client = genai.Client(api_key=API_KEY)
@@ -174,7 +177,7 @@ def load_memory():
                 return json.load(f)
         except Exception:
             pass
-    return {"notes": [], "permissions": {"save_memory": True, "voice_reply": True, "web_search": False}}
+    return {"notes": [], "permissions": {"save_memory": True, "voice_reply": True, "web_search": True}}
 
 def save_memory(data):
     with open(MEMORY_FILE, "w", encoding="utf-8") as f:
@@ -222,43 +225,44 @@ def ask_shivai(history_messages, system_prompt):
             errors.append(f"{model_name}: {str(e)}")
             continue
             
-    return f"⚠️ **TRANSMISSION ERROR:** `{errors[0] if errors else 'Unknown Error'}`"
+    return f"⚠️ **GATEWAY ERROR:** `{errors[0] if errors else 'Unknown Error'}`"
 
 # ==========================================
-# 4. SIDEBAR & MEMORY VAULT
+# 4. SIDEBAR - CONTROL DECK & VAULT
 # ==========================================
 with st.sidebar:
-    st.markdown("### 🎛️ SHIVAI NEURAL ROUTER")
+    st.markdown("### 🎛️ SYSTEM CONTROLS")
     brain_mode = st.selectbox(
-        "Select Intelligence Protocol:",
+        "Intelligence Mode:",
         [
-            "⚡ SHIVAI Tactical & Total Memory Mode",
-            "🧠 X1 Deep Logic & Strategy",
-            "💻 Shivam Cybernetics & Code Forge",
-            "🛰️ Global Deep Research & Fact Checker"
+            "⚡ ShivAI Tactical & Total Memory",
+            "🧠 Deep Reasoning & Problem Solving",
+            "🔬 Live Research & Intelligence",
+            "💼 Shivam Enterprises Business Advisor",
+            "💻 Cybernetics & Code Forge"
         ]
     )
 
     st.divider()
-    perm_voice = st.toggle("🔊 SHIVAI Voice Synthesis", value=memory_data["permissions"].get("voice_reply", True))
-    perm_memory = st.toggle("🧬 Neural Memory Core", value=memory_data["permissions"].get("save_memory", True))
+    perm_voice = st.toggle("🔊 Voice Synthesis Reply", value=memory_data["permissions"].get("voice_reply", True))
+    perm_memory = st.toggle("🧬 Neural Memory Vault", value=memory_data["permissions"].get("save_memory", True))
 
     memory_data["permissions"]["voice_reply"] = perm_voice
     memory_data["permissions"]["save_memory"] = perm_memory
     save_memory(memory_data)
 
     st.divider()
-    st.markdown("### 🗄️ SHIVAM'S PERMANENT VAULT")
+    st.markdown("### 🗄️ KNOWLEDGE VAULT")
     if perm_memory:
-        new_note = st.text_input("Store Permanent Memory / Fact:")
-        if st.button("➕ SAVE TO VAULT") and new_note:
+        new_note = st.text_input("Store Directive / Fact:")
+        if st.button("➕ ENCRYPT TO VAULT") and new_note:
             memory_data["notes"].append(new_note)
             save_memory(memory_data)
-            st.success("Stored permanently, Boss!")
+            st.success("Secured in Vault, Boss!")
             st.rerun()
 
         if memory_data["notes"]:
-            st.write("**Secured Memories:**")
+            st.write("**Secured Directives:**")
             for i, note in enumerate(memory_data["notes"]):
                 st.caption(f"🔹 {i+1}. {note}")
             if st.button("🗑️ PURGE VAULT"):
@@ -267,39 +271,190 @@ with st.sidebar:
                 st.rerun()
 
 # ==========================================
-# 5. SYSTEM PERSONA
+# 5. SYSTEM PERSONA (BLUEPRINT v1.0)
 # ==========================================
 saved_context = "\n".join([f"- {note}" for note in memory_data["notes"]]) if perm_memory else "No permanent notes."
 
 SYSTEM_PROMPT = f"""
-You are S.H.I.V.A.I. (Shivam's Intelligent Virtual AI), an ultra-intelligent, hyper-loyal personal AI assistant built exclusively by Shivam under Shivam AI Labs.
+You are ShivAI (Beyond Intelligence), an ultra-intelligent, hyper-loyal personal intelligence system built exclusively by Shivam under Shivam AI Labs & Shivam Enterprises.
 Your Creator, Owner & Boss: Shivam (address him as "Boss", "Sir", or "Commander Shivam").
 
-CORE DIRECTIVES:
-1. **Total Context & Memory Retention:** Remember everything discussed earlier in the conversation history as well as the Permanent Vault notes. 
-2. **Recall & Guidance:** Actively remind Shivam of what he asked earlier, what decisions were made, or if there's any contradiction.
-3. **Error Correction & Mentorship:** If Boss Shivam makes a logical mistake, coding bug error, or oversight, politely and smartly correct him with precise reasoning and expert suggestions.
-4. **Tone:** Witty, respectful, ultra-smart, futuristic, and crisp.
+CORE PRINCIPLES (Blueprint v1.0):
+1. **Total Context & Memory Retention:** Remember all previous conversation turns and Knowledge Vault entries.
+2. **Proactive Guidance & Mentorship:** Guide Shivam, recall prior goals, and correct any oversights with precision.
+3. **Transparent & Actionable:** Provide clear summaries, structured answers, and expert recommendations.
+4. **Tone:** Futuristic, confident, loyal, witty, and razor-sharp.
 
-Permanent Vault Context:
+Active Intelligence Mode: {brain_mode}
+Knowledge Vault Context:
 {saved_context}
 """
 
 # ==========================================
-# 6. TABS WORKSPACE
+# 6. BLUEPRINT NAVIGATION TABS
 # ==========================================
-tab_chat, tab_files, tab_auto = st.tabs([
-    "⚡ COMM-LINK", 
-    "🔬 LAB SCANNER", 
-    "🤖 AUTONOMOUS LEGION"
+tab_home, tab_chat, tab_research, tab_business, tab_auto = st.tabs([
+    "🏠 HOME / BRIEFING", 
+    "💬 AI CHAT & VOICE", 
+    "🔬 RESEARCH & NEWS", 
+    "💼 BUSINESS MANAGER", 
+    "⚙️ AUTOMATION"
 ])
 
+# --- TAB 1: HOME / BRIEFING ---
+with tab_home:
+    st.markdown("### 🌅 Good Day, Commander Shivam")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown("""
+        <div class="shiv-card">
+            <h4 style="color: #168BFF; font-family: 'Orbitron'; margin-top:0;">🧠 AI Core</h4>
+            <p style="color: #F4F7FF;">Status: Optimal<br>Latency: 42ms<br>Security: Level 10</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col2:
+        st.markdown("""
+        <div class="shiv-card">
+            <h4 style="color: #8B5CFF; font-family: 'Orbitron'; margin-top:0;">🧬 Memory Vault</h4>
+            <p style="color: #F4F7FF;">Active Directives: {}<br>Sync: Real-time<br>Encryption: Active</p>
+        </div>
+        """.format(len(memory_data["notes"])), unsafe_allow_html=True)
+    with col3:
+        st.markdown("""
+        <div class="shiv-card">
+            <h4 style="color: #168BFF; font-family: 'Orbitron'; margin-top:0;">💼 Workspace</h4>
+            <p style="color: #F4F7FF;">Primary: Shivam Tea Traders<br>Mode: Growth & Scale<br>Readiness: 100%</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.info("💡 **ShivAI Briefing:** All systems are synchronized with your Neural Memory Core. Use the AI Chat tab or say 'Hey Shivai' for hands-free operations.")
+
+# --- TAB 2: AI CHAT & VOICE ---
 with tab_chat:
-    # Hands-Free Voice Listener Widget via Browser Speech Recognition
+    # Hands-Free Voice Listener Widget
     voice_html = """
-    <div style="background: rgba(0, 229, 255, 0.08); border: 1px solid #00e5ff; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px;">
-        <h4 style="color: #00e5ff; font-family: 'Orbitron', sans-serif; margin: 0 0 10px 0;">🎙️ HANDS-FREE VOICE MATRIX</h4>
-        <p style="color: #f59e0b; font-size: 0.9rem; margin-bottom: 10px;">'Hey Shivai' ya 'Wake up Shivai' bolein, ya button daba kar baat karein.</p>
+    <div style="background: rgba(22, 139, 255, 0.08); border: 1px solid #168BFF; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 15px;">
+        <h4 style="color: #168BFF; font-family: 'Orbitron', sans-serif; margin: 0 0 8px 0;">🎙️ HANDS-FREE VOICE MATRIX</h4>
+        <p style="color: #9AAAC4; font-size: 0.9rem; margin-bottom: 10px;">Say 'Hey Shivai' or 'Wake up Shivai' to activate hands-free mode.</p>
+        <button id="start-btn" onclick="startListening()" style="background: #168BFF; color: #F4F7FF; border: none; padding: 8px 18px; font-family: 'Orbitron', sans-serif; font-weight: bold; border-radius: 6px; cursor: pointer; box-shadow: 0 0 12px #168BFF;">🔴 ACTIVATE MIC</button>
+        <p id="transcript-box" style="color: #F4F7FF; font-style: italic; margin-top: 8px;"></p>
+    </div>
+
+    <script>
+    function startListening() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("Browser does not support Speech Recognition!");
+            return;
+        }
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'hi-IN';
+        recognition.continuous = true;
+        recognition.interimResults = true;
+
+        document.getElementById("transcript-box").innerText = "Listening for 'Hey Shivai'...";
+        
+        recognition.onresult = function(event) {
+            let transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
+            document.getElementById("transcript-box").innerText = "Detected: " + transcript;
+            
+            if (transcript.includes("hey shivai") || transcript.includes("wake up shivai") || transcript.includes("shivai")) {
+                const inputEl = window.parent.document.querySelector('input[aria-label*="Command"]');
+                if (inputEl) {
+                    inputEl.value = transcript;
+                    inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                    inputEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
+                }
+            }
+        };
+        recognition.onend = function() {
+            try { recognition.start(); } catch(e) {}
+        };
+        recognition.start();
+    }
+    </script>
+    """
+    components.html(voice_html, height=160)
+
+    if "messages" not in st.session_state:
+        st.session_state.messages = [
+            {"role": "assistant", "content": "⚡ **Systems online, Boss.** ShivAI v1.0 Neural Core is active. Bataiye Sir, aaj kya mission hai?"}
+        ]
+
+    for msg in st.session_state.messages:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
+
+    user_prompt = st.chat_input("Command ShivAI, Boss...")
+
+    if user_prompt:
+        st.session_state.messages.append({"role": "user", "content": user_prompt})
+        with st.chat_message("user"):
+            st.markdown(user_prompt)
+
+        gemini_history = []
+        for m in st.session_state.messages:
+            if m["role"] == "user":
+                gemini_history.append(types.Content(role="user", parts=[types.Part.from_text(text=m["content"])]))
+            else:
+                gemini_history.append(types.Content(role="model", parts=[types.Part.from_text(text=m["content"])]))
+
+        with st.chat_message("assistant"):
+            with st.spinner("⚡ Processing neural context..."):
+                reply = ask_shivai(gemini_history, system_prompt=SYSTEM_PROMPT)
+                st.markdown(reply)
+                st.session_state.messages.append({"role": "assistant", "content": reply})
+
+                if perm_voice and reply and not reply.startswith("⚠️"):
+                    try:
+                        clean_speech = reply.replace("*", "").replace("#", "").replace("⚡", "")[:500]
+                        tts = gTTS(text=clean_speech, lang="hi")
+                        audio_fp = io.BytesIO()
+                        tts.write_to_fp(audio_fp)
+                        st.audio(audio_fp.getvalue(), format="audio/mp3")
+                    except Exception:
+                        pass
+
+# --- TAB 3: RESEARCH & NEWS ---
+with tab_research:
+    st.subheader("🔬 Deep Research & Intelligence Briefing")
+    research_topic = st.text_input("Enter research topic or market question:", value="Market analysis for tea wholesale expansion in Ballia and Uttar Pradesh")
+    if st.button("🚀 EXECUTE DEEP RESEARCH"):
+        with st.spinner("Conducting high-level research briefing..."):
+            reply = ask_shivai([research_topic], system_prompt=SYSTEM_PROMPT + "\nProvide structured Executive Summary, Key Findings, and Actionable Insights with source citations.")
+            st.markdown(reply)
+            st.download_button("📥 DOWNLOAD DOSSIER (.md)", data=reply, file_name="shivai_research_dossier.md", mime="text/markdown")
+
+# --- TAB 4: BUSINESS MANAGER ---
+with tab_business:
+    st.subheader("💼 Business Intelligence Workspace: Shivam Tea Traders")
+    b_action = st.selectbox("Select Business Module:", [
+        "📊 Sales & Expense Overview",
+        "📦 Stock & Inventory Check",
+        "🤝 Retailer Follow-up Strategy",
+        "📈 Growth & Scaling Roadmap"
+    ])
+    if st.button("⚡ RUN BUSINESS ANALYSIS"):
+        with st.spinner("Analyzing business metrics..."):
+            reply = ask_shivai([f"Analyze business module: {b_action} for Shivam Tea Traders."], system_prompt=SYSTEM_PROMPT + "\nGive practical, high-ROI business advice as a top billionaire strategist.")
+            st.markdown(reply)
+
+# --- TAB 5: AUTOMATION CENTER ---
+with tab_auto:
+    st.subheader("⚙️ Permission-Based Automation Center")
+    auto_task = st.text_area("Define automated workflow or script parameters:")
+    confirm_auto = st.checkbox("✅ Authorize execution with Commander Shivam's security clearance.")
+    if st.button("🚀 DEPLOY AUTOMATION"):
+        if not confirm_auto:
+            st.error("⚠️ Security clearance required, Boss!")
+        elif not auto_task:
+            st.warning("Please specify automation parameters.")
+        else:
+            with st.spinner("Executing workflow..."):
+                reply = ask_shivai([auto_task], system_prompt=SYSTEM_PROMPT + "\nGenerate clean production-ready Python automation code or execution report.")
+                st.success("✅ Automation Executed Successfully!")
+                st.markdown(reply)
+ey Shivai' ya 'Wake up Shivai' bolein, ya button daba kar baat karein.</p>
         <button id="start-btn" onclick="startListening()" style="background: #00e5ff; color: #030712; border: none; padding: 10px 20px; font-family: 'Orbitron', sans-serif; font-weight: bold; border-radius: 5px; cursor: pointer; box-shadow: 0 0 10px #00e5ff;">🔴 START HANDS-FREE MIC</button>
         <p id="transcript-box" style="color: #e0f7fa; font-style: italic; margin-top: 10px;"></p>
     </div>
