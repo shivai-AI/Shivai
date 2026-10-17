@@ -36,7 +36,6 @@ def _resolve_hidden_api_key() -> str:
             return val
     return st.session_state.get("_vault_runtime_key", "").strip()
 
-
 def get_secure_ai_client():
     raw_key = _resolve_hidden_api_key()
     if not raw_key:
@@ -97,7 +96,7 @@ UI_STYLESHEET = [
     "@keyframes spin-vortex-rev { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }",
     ".shivai-logo-text { font-family: 'Inter', sans-serif; font-size: 3.2rem; font-weight: 800; letter-spacing: -1px; line-height: 1.05; margin: 0; }",
     ".shivai-logo-text .shiv-part { color: #FFFFFF; }",
-    ".shivai-logo-text .ai-part { background: linear-gradient(180deg, #38B6FF 0%, #168BFF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px rgba(22, 139, 255, 0.5)); }",
+    ".shivai-logo-text .ai-part { background: linear-gradient(180deg, #38B6FF 0%, #1668FF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px rgba(22, 139, 255, 0.5)); }",
     ".beyond-subtitle { font-size: 1.15rem; font-weight: 400; color: #D6E2FF; margin-top: 6px; margin-bottom: 30px; }",
     ".personal-assistant-label { font-size: 0.95rem; font-weight: 500; color: #E2ECFF; margin-bottom: 10px; }",
     ".capabilities-row { font-size: 0.72rem; font-weight: 600; letter-spacing: 2.3px; color: #9AAAC4; text-transform: uppercase; margin-bottom: 20px; }",
@@ -113,17 +112,11 @@ UI_STYLESHEET = [
     ".sb-sub { font-size: 0.74rem; color: #9AAAC4; margin: 2px 0 0 0; }",
     "[data-testid='stSidebar'] .stButton > button { background: transparent !important; color: #F4F7FF !important; border: none !important; border-radius: 10px !important; padding: 9px 12px !important; font-size: 0.9rem !important; font-weight: 500 !important; display: flex !important; align-items: center !important; justify-content: flex-start !important; width: 100% !important; box-shadow: none !important; margin-bottom: 2px !important; }",
     "[data-testid='stSidebar'] .stButton > button:hover { background: rgba(22, 139, 255, 0.14) !important; color: #FFFFFF !important; }",
-    ".st-key-nav_new button::after { content: 'Ctrl + N'; margin-left: auto; color: #647794; font-size: 0.74rem; }",
-    ".st-key-nav_voice button::after { content: 'Ctrl + V'; margin-left: auto; color: #647794; font-size: 0.74rem; }",
-    ".st-key-nav_res button::after { content: 'Ctrl + R'; margin-left: auto; color: #647794; font-size: 0.74rem; }",
-    ".st-key-nav_mod button::after { content: 'Ctrl + M'; margin-left: auto; color: #647794; font-size: 0.74rem; }",
-    ".st-key-nav_proj button::after { content: 'Ctrl + P'; margin-left: auto; color: #647794; font-size: 0.74rem; }",
-    ".st-key-nav_vault button::after { content: 'Ctrl + K'; margin-left: auto; color: #647794; font-size: 0.74rem; }",
     ".sb-section-label { font-size: 0.76rem; font-weight: 600; color: #9AAAC4; margin: 12px 0 8px 4px; }",
     ".sb-icon-grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; text-align: center; margin-bottom: 12px; }",
     ".sb-icon-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; margin-bottom: 14px; }",
     ".sb-tile { display: flex; flex-direction: column; align-items: center; gap: 4px; }",
-    ".sb-tile-box { width: 42px; height: 42px; border-radius: 11px; background: #0B1528; border: 1px solid rgba(56, 182, 255, 0.22); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }",
+    ".sb-tile-box { width: 42px; height: 42px; border-radius: 11px; background: #0B1628; border: 1px solid rgba(56, 182, 255, 0.22); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }",
     ".sb-tile-name { font-size: 0.66rem; color: #C4D2EC; font-weight: 500; }",
     ".sb-footer { text-align: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.06); }",
     ".sb-footer-text { font-size: 0.74rem; color: #9AAAC4; margin-bottom: 6px; }",
@@ -131,7 +124,7 @@ UI_STYLESHEET = [
     "[data-testid='stChatMessage'] { background: #0B1628 !important; border: 1px solid rgba(22, 139, 255, 0.25); border-radius: 14px; padding: 12px 15px; margin-bottom: 10px; }",
     "</style>"
 ]
-st.markdown("\n".join(UI_STYLESHEET), unsafe_allow_html=True)
+st.markdown("".join(UI_STYLESHEET), unsafe_allow_html=True)
 
 # =====================================================================
 # 5. AI ORCHESTRATION & BOOSTED VOICE ENGINE
@@ -200,7 +193,7 @@ def synthesize_boosted_voice(speech_text: str) -> None:
             "})();",
             "</script>"
         ]
-        components.html("\n".join(audio_script), height=0)
+        components.html("".join(audio_script), height=0)
     except Exception:
         pass
 
@@ -266,7 +259,7 @@ with st.sidebar:
         "</div></div>",
         "<div class='sb-footer'><div class='sb-footer-text'>Smarter Tools. Bigger Dreams.</div><div class='sb-wave'></div></div>"
     ]
-    st.markdown("\n".join(sidebar_widgets), unsafe_allow_html=True)
+    st.markdown("".join(sidebar_widgets), unsafe_allow_html=True)
 
 # =====================================================================
 # 7. CORE SYSTEM DIRECTIVE
@@ -302,7 +295,7 @@ if current_view == "New Chat":
             "<div class='mode-pills'><span class='pill-active'>Chat</span><span class='pill-inactive'>Task</span></div>",
             "</div>"
         ]
-        st.markdown("\n".join(front_screen_html), unsafe_allow_html=True)
+        st.markdown("".join(front_screen_html), unsafe_allow_html=True)
     else:
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
@@ -337,4 +330,17 @@ elif current_view == "Voice Mode":
         "<div class='vortex-container'><div class='vortex-ring-1'></div><div class='vortex-ring-2'></div>"
         "<div class='vortex-core'><span class='vortex-s'>S</span></div></div>"
         "<h3 style='color:#FFFFFF; margin-bottom:4px;'>Listening...</h3>"
-        "<p style='color:#9AAA
+        "<p style='color:#9AAAC4; font-size:0.9rem;'>Speak now, Commander Shivam</p>"
+        "</div>"
+    )
+    st.markdown(voice_screen_html, unsafe_allow_html=True)
+    recorded_audio = st.audio_input("🎙️ Tap Microphone to Transmit Voice Command:")
+    if recorded_audio is not None:
+        raw_audio = recorded_audio.read()
+        if st.session_state.get("_last_audio_hash") != raw_audio:
+            st.session_state._last_audio_hash = raw_audio
+            with st.spinner("⚡ Processing voice transmission..."):
+                audio_payload = [
+                    types.Part.from_bytes(data=raw_audio, mime_type="audio/wav"),
+                    "Listen carefully to Commander Shivam's voice command and respond accurately."
+          
