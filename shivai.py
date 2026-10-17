@@ -22,7 +22,6 @@ st.set_page_config(
 # 2. SECURE API GATEWAY (HIDDEN CREDENTIAL MANAGEMENT)
 # =====================================================================
 def _resolve_hidden_api_key() -> str:
-    # Priority 1: Check Streamlit Cloud Secrets silently
     for secret_name in ("API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY"):
         try:
             if secret_name in st.secrets:
@@ -31,14 +30,10 @@ def _resolve_hidden_api_key() -> str:
                     return val
         except Exception:
             pass
-
-    # Priority 2: Check Server Environment Variables
     for env_name in ("API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY"):
         val = os.environ.get(env_name, "").strip()
         if val:
             return val
-
-    # Priority 3: Check Encrypted Session Vault (Temporary Masked Input)
     return st.session_state.get("_vault_runtime_key", "").strip()
 
 
@@ -50,7 +45,6 @@ def get_secure_ai_client():
         return genai.Client(api_key=raw_key)
     except Exception:
         return None
-
 
 # =====================================================================
 # 3. PERSISTENT KNOWLEDGE VAULT (LOCAL JSON STORAGE)
@@ -72,7 +66,6 @@ def load_vault_memory() -> dict:
         }
     }
 
-
 def save_vault_memory(data: dict) -> None:
     try:
         with open(MEMORY_FILE, "w", encoding="utf-8") as file:
@@ -80,17 +73,14 @@ def save_vault_memory(data: dict) -> None:
     except Exception:
         pass
 
-
 vault_data = load_vault_memory()
-
 if "active_view" not in st.session_state:
     st.session_state.active_view = "New Chat"
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-
 # =====================================================================
-# 4. DESIGN SYSTEM & PIXEL-ACCURATE CSS (NO TRIPLE QUOTES)
+# 4. DESIGN SYSTEM & PIXEL-ACCURATE CSS
 # =====================================================================
 UI_STYLESHEET = [
     "<style>",
@@ -133,7 +123,7 @@ UI_STYLESHEET = [
     ".sb-icon-grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; text-align: center; margin-bottom: 12px; }",
     ".sb-icon-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; margin-bottom: 14px; }",
     ".sb-tile { display: flex; flex-direction: column; align-items: center; gap: 4px; }",
-    ".sb-tile-box { width: 42px; height: 42px; border-radius: 11px; background: #0B1628; border: 1px solid rgba(56, 182, 255, 0.22); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }",
+    ".sb-tile-box { width: 42px; height: 42px; border-radius: 11px; background: #0B1528; border: 1px solid rgba(56, 182, 255, 0.22); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }",
     ".sb-tile-name { font-size: 0.66rem; color: #C4D2EC; font-weight: 500; }",
     ".sb-footer { text-align: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.06); }",
     ".sb-footer-text { font-size: 0.74rem; color: #9AAAC4; margin-bottom: 6px; }",
@@ -142,7 +132,6 @@ UI_STYLESHEET = [
     "</style>"
 ]
 st.markdown("\n".join(UI_STYLESHEET), unsafe_allow_html=True)
-
 
 # =====================================================================
 # 5. AI ORCHESTRATION & BOOSTED VOICE ENGINE
@@ -165,7 +154,6 @@ def get_available_models() -> list:
     pro_tier = [m for m in discovered if "flash" not in m]
     return (flash_tier + pro_tier) or ["gemini-2.5-flash", "gemini-2.0-flash"]
 
-
 def generate_shivai_response(contents_payload, system_instruction: str) -> str:
     client = get_secure_ai_client()
     if not client:
@@ -184,7 +172,6 @@ def generate_shivai_response(contents_payload, system_instruction: str) -> str:
         except Exception:
             continue
     return "⚡ **Neural Gateway Busy:** Unable to reach the AI core right now. Please retry in a few seconds."
-
 
 def synthesize_boosted_voice(speech_text: str) -> None:
     try:
@@ -216,7 +203,6 @@ def synthesize_boosted_voice(speech_text: str) -> None:
         components.html("\n".join(audio_script), height=0)
     except Exception:
         pass
-
 
 # =====================================================================
 # 6. SIDEBAR DRAWER NAVIGATION
@@ -282,7 +268,6 @@ with st.sidebar:
     ]
     st.markdown("\n".join(sidebar_widgets), unsafe_allow_html=True)
 
-
 # =====================================================================
 # 7. CORE SYSTEM DIRECTIVE
 # =====================================================================
@@ -294,7 +279,6 @@ SYSTEM_INSTRUCTION = (
     "and provide strategic, high-ROI guidance for his technology projects and Shivam Tea Traders (Ballia). "
     f"Knowledge Vault Context:\n{vault_notes_str}"
 )
-
 
 # =====================================================================
 # 8. MAIN APPLICATION VIEWS
@@ -350,4 +334,7 @@ if current_view == "New Chat":
 elif current_view == "Voice Mode":
     voice_screen_html = (
         "<div class='hero-wrapper'>"
-        "<div class='vortex-container'><div class='vortex-ring-1'></div><di
+        "<div class='vortex-container'><div class='vortex-ring-1'></div><div class='vortex-ring-2'></div>"
+        "<div class='vortex-core'><span class='vortex-s'>S</span></div></div>"
+        "<h3 style='color:#FFFFFF; margin-bottom:4px;'>Listening...</h3>"
+        "<p style='color:#9AAA
